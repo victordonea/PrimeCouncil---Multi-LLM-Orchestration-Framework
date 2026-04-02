@@ -106,4 +106,4 @@ Packets in run folders follow this naming:
 - `claude-implementation-summary.md` — post-execution summary
 - `decision.md` — implementation review decision
 
-See `runs-readme.md` for full folder structure.
+See `runs-spec.md` for full folder structure.
