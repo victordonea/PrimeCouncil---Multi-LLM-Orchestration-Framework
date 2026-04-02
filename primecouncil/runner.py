@@ -274,13 +274,17 @@ def cmd_status(args):
         print(json.dumps({"status": "error", "message": f"Task dir not found: {task_dir}"}))
         sys.exit(1)
 
+    # Task-root files (task.md, task-summary.md, etc.)
+    root_files = [f for f in os.listdir(task_dir) if os.path.isfile(os.path.join(task_dir, f))]
+
+    # Round folders
     rounds = sorted([d for d in os.listdir(task_dir) if d.startswith("round-")])
     files_per_round = {}
     for r in rounds:
         round_path = os.path.join(task_dir, r)
         files_per_round[r] = os.listdir(round_path)
 
-    # Include implementation-review if it exists
+    # Implementation-review folder
     impl_dir = os.path.join(task_dir, "implementation-review")
     impl_files = None
     if os.path.exists(impl_dir):
@@ -289,6 +293,7 @@ def cmd_status(args):
     result = {
         "status": "ok",
         "task_id": args.task_id,
+        "task_root_files": root_files,
         "rounds": len(rounds),
         "files": files_per_round,
     }
@@ -296,6 +301,66 @@ def cmd_status(args):
         result["implementation_review"] = impl_files
 
     print(json.dumps(result, indent=2))
+
+
+# ─── LIST ─────────────────────────────────────────────────
+
+def cmd_list(args):
+    """List all tasks with status, mode, last-modified, and summary availability."""
+    if not os.path.exists(RUNS_DIR):
+        print(json.dumps({"status": "ok", "tasks": []}))
+        return
+
+    tasks = []
+    for name in sorted(os.listdir(RUNS_DIR)):
+        task_dir = os.path.join(RUNS_DIR, name)
+        if not os.path.isdir(task_dir):
+            continue
+
+        task_info = {"task_id": name}
+
+        # Read status and mode from task.md
+        task_md_path = os.path.join(task_dir, "task.md")
+        if os.path.exists(task_md_path):
+            with open(task_md_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("- Status:"):
+                        task_info["status"] = line.split(":", 1)[1].strip()
+                    elif line.startswith("- Mode:"):
+                        task_info["mode"] = line.split(":", 1)[1].strip()
+        if "status" not in task_info:
+            task_info["status"] = "unknown"
+        if "mode" not in task_info:
+            task_info["mode"] = "unknown"
+
+        # Last modified — most recent file modification in the task tree
+        latest_mtime = 0
+        for root, dirs, files in os.walk(task_dir):
+            for f in files:
+                fpath = os.path.join(root, f)
+                mtime = os.path.getmtime(fpath)
+                if mtime > latest_mtime:
+                    latest_mtime = mtime
+        if latest_mtime > 0:
+            task_info["last_modified"] = datetime.datetime.fromtimestamp(
+                latest_mtime
+            ).strftime("%Y-%m-%d %H:%M")
+        else:
+            task_info["last_modified"] = "unknown"
+
+        # Check for task-summary.md
+        task_info["has_summary"] = os.path.exists(
+            os.path.join(task_dir, "task-summary.md")
+        )
+
+        # Count rounds
+        rounds = [d for d in os.listdir(task_dir) if d.startswith("round-")]
+        task_info["rounds"] = len(rounds)
+
+        tasks.append(task_info)
+
+    print(json.dumps({"status": "ok", "tasks": tasks}, indent=2))
 
 
 # ─── MAIN ─────────────────────────────────────────────────
@@ -333,6 +398,9 @@ def main():
     p_status = subparsers.add_parser("status", help="Show task status")
     p_status.add_argument("--task-id", required=True, help="Task ID")
 
+    # list
+    subparsers.add_parser("list", help="List all tasks with status and summary info")
+
     args = parser.parse_args()
 
     if args.command == "init":
@@ -345,6 +413,8 @@ def main():
         cmd_new_round(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "list":
+        cmd_list(args)
     else:
         parser.print_help()
         sys.exit(1)
