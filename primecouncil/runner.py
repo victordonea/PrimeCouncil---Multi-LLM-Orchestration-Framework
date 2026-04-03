@@ -49,6 +49,59 @@ SCRIPTS_DIR = os.path.join(_REPO_ROOT, CONFIG["scripts_dir"])
 TEMPLATES_DIR = os.path.join(_REPO_ROOT, CONFIG["templates_dir"])
 
 
+def _classify_round(present, is_impl=False):
+    """Classify a round/impl folder's status from its file list.
+
+    Infers expected reviewers from packet files (compatible with single-reviewer mode).
+    Returns (status_string, missing_list) where missing only lists stage-blocking files.
+    """
+    files = set(present)
+    if not files:
+        return "empty", []
+
+    # Infer which reviewers were intended from packet files
+    expect_codex = "packet-codex.md" in files
+    expect_gemini = "packet-gemini.md" in files
+    packets_exist = expect_codex or expect_gemini
+
+    if not packets_exist:
+        # Reviews not invoked yet — normal in-progress
+        return "in_progress", []
+
+    # Build expected reviewer outputs based on which packets exist
+    expected_raw = set()
+    expected_review = set()
+    if expect_codex:
+        expected_raw.add("codex-output-raw.md")
+        expected_review.add("codex-review.md")
+    if expect_gemini:
+        expected_raw.add("gemini-output-raw.md")
+        expected_review.add("gemini-review.md")
+
+    missing_raw = expected_raw - files
+    missing_review = expected_review - files
+
+    # Stage 1: any expected raw output missing — reviewer never ran or crashed
+    if missing_raw:
+        return "reviews_failed", sorted(missing_raw | missing_review)
+
+    # Stage 2: raw exists but normalized review missing (extraction failed)
+    if missing_review:
+        return "reviews_degraded", sorted(missing_review)
+
+    # Reviews are all present — check downstream completeness
+    if is_impl:
+        impl_downstream = {"claude-implementation-summary.md", "decision.md"}
+        missing_impl = impl_downstream - files
+        if missing_impl:
+            return "in_progress", []
+    else:
+        if "synthesis.md" not in files:
+            return "in_progress", []
+
+    return "complete", []
+
+
 def get_today():
     return datetime.date.today().strftime("%Y-%m-%d")
 
@@ -330,7 +383,7 @@ def cmd_new_round(args):
 # ─── STATUS ───────────────────────────────────────────────
 
 def cmd_status(args):
-    """Show current state of a task."""
+    """Show current state of a task with partial-state detection."""
     task_dir = os.path.join(RUNS_DIR, args.task_id)
     if not os.path.exists(task_dir):
         print(json.dumps({"status": "error", "message": f"Task dir not found: {task_dir}"}))
@@ -342,15 +395,22 @@ def cmd_status(args):
     # Round folders
     rounds = sorted([d for d in os.listdir(task_dir) if d.startswith("round-")])
     files_per_round = {}
+    round_status = {}
     for r in rounds:
         round_path = os.path.join(task_dir, r)
-        files_per_round[r] = os.listdir(round_path)
+        present = os.listdir(round_path)
+        files_per_round[r] = present
+        status, missing = _classify_round(present)
+        round_status[r] = {"status": status, "missing": missing}
 
     # Implementation-review folder
     impl_dir = os.path.join(task_dir, "implementation-review")
     impl_files = None
+    impl_status_info = None
     if os.path.exists(impl_dir):
         impl_files = os.listdir(impl_dir)
+        status, missing = _classify_round(impl_files, is_impl=True)
+        impl_status_info = {"status": status, "missing": missing}
 
     result = {
         "status": "ok",
@@ -358,9 +418,38 @@ def cmd_status(args):
         "task_root_files": root_files,
         "rounds": len(rounds),
         "files": files_per_round,
+        "round_status": round_status,
     }
     if impl_files is not None:
         result["implementation_review"] = impl_files
+        result["implementation_review_status"] = impl_status_info
+
+    # Flag recovery-needed states and build hint preserving single-reviewer intent
+    recovery_states = {"reviews_failed", "reviews_degraded"}
+    broken = []
+    for r, info in round_status.items():
+        if info["status"] in recovery_states:
+            num = int(r.split("-")[1])
+            round_files = set(files_per_round[r])
+            broken.append(("round", num, round_files))
+    if impl_status_info and impl_status_info["status"] in recovery_states:
+        broken.append(("impl", 0, set(impl_files)))
+
+    if broken:
+        result["has_incomplete"] = True
+        kind, num, present_files = broken[0]
+        # Infer reviewer flags from packet files
+        has_codex_pkt = "packet-codex.md" in present_files
+        has_gemini_pkt = "packet-gemini.md" in present_files
+        reviewer_flag = ""
+        if has_codex_pkt and not has_gemini_pkt:
+            reviewer_flag = " --codex-only"
+        elif has_gemini_pkt and not has_codex_pkt:
+            reviewer_flag = " --gemini-only"
+        if kind == "round":
+            result["recovery_hint"] = f"Re-run: python primecouncil/runner.py review --task-id {args.task_id} --round {num}{reviewer_flag} --content \"...\""
+        else:
+            result["recovery_hint"] = f"Re-run: python primecouncil/runner.py review --task-id {args.task_id} --impl{reviewer_flag} --content \"...\""
 
     print(json.dumps(result, indent=2))
 
