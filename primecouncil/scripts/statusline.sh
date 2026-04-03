@@ -5,17 +5,17 @@
 
 input=$(cat)
 
-# Extract session info from Claude Code JSON via python3
-read -r MODEL CTX <<< "$(python3 -c "
+# Extract session info from Claude Code JSON via python3 (read from stdin, not argv)
+read -r MODEL CTX <<< "$(echo "$input" | python3 -c "
 import json, sys
 try:
-    d = json.loads(sys.argv[1])
+    d = json.load(sys.stdin)
     model = d.get('model', {}).get('display_name', '?')
     ctx = int(d.get('context_window', {}).get('used_percentage', 0))
     print(model, ctx)
 except:
     print('? 0')
-" "$input" 2>/dev/null || echo "? 0")"
+" 2>/dev/null || echo "? 0")"
 
 # Read orchestration state (resolve relative to this script)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
