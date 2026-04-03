@@ -30,6 +30,8 @@ Commands: `ORCH ON/OFF`, `MODE MANUAL/STANDARD/DEEP`, `GO STANDARD/DEEP/DIRECT`.
 
 ORCH OFF = behave normally. ORCH ON = orchestration-aware, recommend modes on substantial tasks. MODE MANUAL = recommend and wait. MODE STANDARD/DEEP = default to that mode unless overridden.
 
+When the user says ORCH ON, ORCH OFF, MODE MANUAL, MODE STANDARD, or MODE DEEP, update `primecouncil/orch-state.json` to match. GO STANDARD / GO DEEP / GO DIRECT are task-scoped only and do not update persistent defaults.
+
 ---
 
 ## Task envelope

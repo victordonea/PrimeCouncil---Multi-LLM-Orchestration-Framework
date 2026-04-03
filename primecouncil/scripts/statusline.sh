@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
 # PrimeCouncil status line — displays orchestration state + session info
 # Receives session JSON on stdin from Claude Code
+# Uses python3 for all JSON parsing (no jq dependency)
 
 input=$(cat)
 
-# Extract session info from Claude Code JSON
-MODEL=$(echo "$input" | jq -r '.model.display_name // "?"')
-CTX=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
+# Extract session info from Claude Code JSON via python3
+read -r MODEL CTX <<< "$(python3 -c "
+import json, sys
+try:
+    d = json.loads(sys.argv[1])
+    model = d.get('model', {}).get('display_name', '?')
+    ctx = int(d.get('context_window', {}).get('used_percentage', 0))
+    print(model, ctx)
+except:
+    print('? 0')
+" "$input" 2>/dev/null || echo "? 0")"
 
 # Read orchestration state (resolve relative to this script)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
