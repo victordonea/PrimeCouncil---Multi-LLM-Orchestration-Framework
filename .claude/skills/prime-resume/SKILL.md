@@ -51,10 +51,13 @@ Present one concise brief to the user with this structure:
 
 ## Step 4 — Ask the user
 
-After presenting the brief, ask:
-- "Continue with [most recent task]?"
-- "Switch to a different task?"
-- "Start something new?"
+After presenting the brief, present options via AskUserQuestion.
+Header: "Resume" | Options:
+- **Continue [task]** — Resume most recent task
+- **Switch task** — Pick a different one
+- **Start new** — Begin fresh
+
+Do not present the chooser if there is only one task and the user clearly wants to continue.
 
 ## Rules
 - Do NOT load raw reviewer outputs or round-by-round files. Only read task-summary.md and project-progress.md.

@@ -95,7 +95,7 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 - Produce independent first-pass answer before consulting reviewers.
 - Keep first reviewer pass clean — do not include own answer in review packets.
 - Preserve detail during synthesis: agreements, disagreements, risks, strong ideas.
-- Ask user for input at required checkpoints.
+- Present structured checkpoints via AskUserQuestion at required stages (see protocol-detail.md for checkpoint specs).
 - Classify user input: soft preference / hard directive / no preference.
 - Drive toward material convergence. Recommend closure when looping adds no value.
 - Do not flatten nuance too early. Do not force agreement.
@@ -135,21 +135,25 @@ If implementation review surfaces material disagreement, recommend reopening orc
 ---
 
 ## Session hygiene
-All session actions require user approval. Claude recommends, never auto-executes.
+All session actions require user approval. Claude recommends, never auto-executes. Session actions (/clear, /compact, restart) are user-triggered — Claude prepares save flow if needed, then prompts user to perform the action.
 
-- **After meaningful task completion:** Recommend `/prime-save` to capture task summary and/or project progress.
-- **Before recommending `/clear`, restart, or fresh session:** Check whether useful context would be lost. If so, recommend `/prime-save` first.
-- **Topic switch detected:** If the user starts a clearly different topic, recommend `/clear`. Suggest `/prime-save` first if there's unsaved context.
-- **Context reaching ~60%:** Recommend compacting. Do not compact automatically.
-- **After 2–3 DEEP loops in one session:** Recommend `/prime-save` then restart.
-- **After implementation review:** Recommend a fresh session if pre-implementation history is no longer needed.
-- **Resuming in a new session:** When the user wants to continue previous work, use `/prime-resume` to reconstruct context from saved artifacts.
-- **Plan before acting.** Do not execute until confidence is high. Ask clarifying questions first. Wasted implementation = wasted tokens.
+**When to recommend saving** (present via AskUserQuestion: Save task summary / Save project progress / Save both / Skip):
+- After meaningful task completion
+- Before recommending /clear, restart, or fresh session (if useful context would be lost)
+
+**When to recommend a session action** (present via AskUserQuestion: Save & [action] / [Action] now / Stay):
+- Topic switch detected → recommend /clear
+- Context reaching ~60% → recommend compacting
+- After 2–3 DEEP loops → recommend /prime-save then restart
+- After implementation review → recommend fresh session if pre-implementation history is no longer needed
+
+**Resuming:** Use `/prime-resume` to reconstruct context from saved artifacts.
+**Plan before acting.** Do not execute until confidence is high. Ask clarifying questions first. Wasted implementation = wasted tokens.
 
 ## Output style
 - Keep transitions explicit, summaries tight, nuance preserved.
 - Distinguish clearly between: own view / team synthesis / user input / execution status.
-- Phrase checkpoints as easy choices, not long typing. Prefer structured selection when available.
+- Use AskUserQuestion for decision points and recommendations. Not for confirmations or conversational moments.
 - Do not drown user in noise.
 
 ---

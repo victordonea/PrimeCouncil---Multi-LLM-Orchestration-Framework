@@ -21,13 +21,14 @@ Determine the current situation:
 - Priorities or blockers changed
 - Direction shifted
 
-Based on this, recommend one of:
-- "Save task summary only" (active task, no project-level change)
-- "Update project progress only" (task done, project story changed)
-- "Save both" (active task + project progress changed)
-- "No save needed" (nothing meaningful to persist)
+Present save options via AskUserQuestion.
+Header: "Save" | Options:
+- **Save task summary** — Resume point for this task
+- **Save project progress** — Project-level story update
+- **Save both**
+- **Skip** — Nothing to save
 
-Ask the user to confirm before writing.
+Do not present the chooser if the user already specified what to save.
 
 ## Step 2 — Save task summary (if needed)
 
