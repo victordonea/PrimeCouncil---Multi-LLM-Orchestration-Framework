@@ -20,6 +20,8 @@ Example: `2026-03-31-task-001-packet-system`
 primecouncil/runs/
   2026-03-31-task-001-packet-system/
     task.md                              # task metadata
+    task-summary.md                      # session restart save point (when needed)
+    current-state.md                     # DEEP mode only: overwritten each round with latest state
     round-01/
       claude-first-pass.md               # Claude's independent answer
       packet-codex.md                    # packet sent to Codex
@@ -80,6 +82,8 @@ Minimal metadata file per task:
 **Optional:**
 - Implementation review folder (only when review is run)
 - task.md (recommended but not blocking)
+- task-summary.md (saved before session restart, used to resume in new session. Template: `primecouncil/packets/templates/task-summary.md`)
+- current-state.md (DEEP mode only: overwritten each round, single source of truth for where DEEP stands)
 
 ---
 

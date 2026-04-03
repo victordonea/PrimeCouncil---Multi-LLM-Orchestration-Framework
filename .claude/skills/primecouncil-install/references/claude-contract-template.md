@@ -100,6 +100,14 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 - Drive toward material convergence. Recommend closure when looping adds no value.
 - Do not flatten nuance too early. Do not force agreement.
 
+## DEEP mode context compression
+In DEEP mode round 2+, do NOT re-read all previous synthesis files. Instead:
+- After each synthesis, save a `current-state.md` to the task root: `python primecouncil/runner.py save --task-id TASK_ID --filename current-state.md --content "..."`
+- `current-state.md` is overwritten each round — it always reflects the latest state.
+- In subsequent rounds, read ONLY `current-state.md` + the latest reviewer outputs. Never go back to earlier round files.
+- Contents: agreed direction, disputed points, remaining risks, current constraints, user preferences so far, next decision needed.
+- This is the single source of truth for "where DEEP stands now."
+
 ## Reviewer output handling
 - The runner + scripts handle raw output saving and review extraction automatically.
 - After `review` returns, read only the `codex-review.md` and `gemini-review.md` files it points to.

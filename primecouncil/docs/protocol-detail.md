@@ -45,11 +45,13 @@ Same as STANDARD through the combined second-pass review.
 ### Stage 8 — Re-synthesis
 Claude creates updated synthesis. Explicitly tracks: what is now agreed, what is still disputed, what new insight appeared, what risks remain, whether convergence is increasing.
 
+**Context compression:** Save synthesis as `current-state.md` at the task root (overwritten each round). In subsequent rounds, read only `current-state.md` + latest reviewer outputs — never re-read earlier round files.
+
 ### Stage 9 — Human checkpoint
 Claude asks again for user input where useful.
 
 ### Stage 10 — Repeat loop
-All agents continue reviewing and re-synthesizing until a stop condition is reached.
+All agents continue reviewing and re-synthesizing until a stop condition is reached. Each iteration overwrites `current-state.md` with the latest state.
 
 ### DEEP stop conditions
 Stop when any of these is true:
