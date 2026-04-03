@@ -127,13 +127,19 @@ def cmd_save(args):
 # ─── REVIEW ───────────────────────────────────────────────
 
 def cmd_review(args):
-    """Write packet files and run both reviewer scripts."""
+    """Write packet files and run reviewer scripts."""
     if not args.impl and args.round is None:
         print(json.dumps({"status": "error", "message": "Must provide --round N or --impl"}))
         sys.exit(1)
     if args.impl and args.round is not None:
         print(json.dumps({"status": "error", "message": "Cannot use both --round and --impl"}))
         sys.exit(1)
+    if getattr(args, 'codex_only', False) and getattr(args, 'gemini_only', False):
+        print(json.dumps({"status": "error", "message": "Cannot use both --codex-only and --gemini-only"}))
+        sys.exit(1)
+
+    run_codex = not getattr(args, 'gemini_only', False)
+    run_gemini = not getattr(args, 'codex_only', False)
 
     task_dir = os.path.join(RUNS_DIR, args.task_id)
 
@@ -167,8 +173,14 @@ def cmd_review(args):
     codex_review_path = os.path.join(review_dir, "codex-review.md")
     gemini_review_path = os.path.join(review_dir, "gemini-review.md")
 
-    # Write packets — replace existing focus line or insert after title
-    for pkt_path, focus in [(packet_codex_path, codex_focus), (packet_gemini_path, gemini_focus)]:
+    # Write packets only for reviewers being run
+    reviewers_to_write = []
+    if run_codex:
+        reviewers_to_write.append((packet_codex_path, codex_focus))
+    if run_gemini:
+        reviewers_to_write.append((packet_gemini_path, gemini_focus))
+
+    for pkt_path, focus in reviewers_to_write:
         lines = packet_body.split("\n")
         has_existing_focus = any(l.strip().startswith("**Reviewer focus:**") for l in lines)
 
@@ -176,68 +188,87 @@ def cmd_review(args):
         focus_inserted = False
         for line in lines:
             if has_existing_focus and line.strip().startswith("**Reviewer focus:**"):
-                # Replace existing focus line
                 output_lines.append(focus)
                 focus_inserted = True
             else:
                 output_lines.append(line)
-                # Insert after first heading only if no existing focus line
                 if not has_existing_focus and not focus_inserted and line.strip().startswith("#"):
                     output_lines.append("")
                     output_lines.append(focus)
                     focus_inserted = True
 
-        # Fallback: prepend if nothing worked
         if not focus_inserted:
             output_lines.insert(0, focus)
 
         with open(pkt_path, "w", encoding="utf-8") as f:
             f.write("\n".join(output_lines))
 
-    # Fix #3: Clear stale review files before running reviewers
-    for stale in [codex_raw_path, gemini_raw_path, codex_review_path, gemini_review_path]:
+    # Clear stale review files only for reviewers being run
+    # Also clean up skipped reviewer's old files to prevent misleading state
+    stale_files = []
+    if run_codex:
+        stale_files.extend([codex_raw_path, codex_review_path])
+    else:
+        # Skipped: remove old artifacts so round state is clean
+        for old in [packet_codex_path, codex_raw_path, codex_review_path]:
+            if os.path.exists(old):
+                os.remove(old)
+    if run_gemini:
+        stale_files.extend([gemini_raw_path, gemini_review_path])
+    else:
+        # Skipped: remove old artifacts so round state is clean
+        for old in [packet_gemini_path, gemini_raw_path, gemini_review_path]:
+            if os.path.exists(old):
+                os.remove(old)
+    for stale in stale_files:
         if os.path.exists(stale):
             os.remove(stale)
 
     results = {"status": "ok", "review_dir": review_dir, "reviewers": {}}
 
     # Run Codex
-    codex_script = os.path.join(SCRIPTS_DIR, "review-codex.sh")
-    try:
-        subprocess.run(
-            ["bash", codex_script, packet_codex_path, codex_raw_path],
-            timeout=300,
-            check=False,
-        )
-        if os.path.exists(codex_review_path):
-            results["reviewers"]["codex"] = {"status": "ok", "review": codex_review_path}
-        elif os.path.exists(codex_raw_path):
-            results["reviewers"]["codex"] = {"status": "degraded", "raw": codex_raw_path}
-        else:
-            results["reviewers"]["codex"] = {"status": "failed"}
-    except subprocess.TimeoutExpired:
-        results["reviewers"]["codex"] = {"status": "timeout"}
-    except Exception as e:
-        results["reviewers"]["codex"] = {"status": "error", "message": str(e)}
+    if run_codex:
+        codex_script = os.path.join(SCRIPTS_DIR, "review-codex.sh")
+        try:
+            subprocess.run(
+                ["bash", codex_script, packet_codex_path, codex_raw_path],
+                timeout=300,
+                check=False,
+            )
+            if os.path.exists(codex_review_path):
+                results["reviewers"]["codex"] = {"status": "ok", "review": codex_review_path}
+            elif os.path.exists(codex_raw_path):
+                results["reviewers"]["codex"] = {"status": "degraded", "raw": codex_raw_path}
+            else:
+                results["reviewers"]["codex"] = {"status": "failed"}
+        except subprocess.TimeoutExpired:
+            results["reviewers"]["codex"] = {"status": "timeout"}
+        except Exception as e:
+            results["reviewers"]["codex"] = {"status": "error", "message": str(e)}
+    else:
+        results["reviewers"]["codex"] = {"status": "skipped"}
 
     # Run Gemini
-    gemini_script = os.path.join(SCRIPTS_DIR, "review-gemini.sh")
-    try:
-        subprocess.run(
-            ["bash", gemini_script, packet_gemini_path, gemini_raw_path],
-            timeout=300,
-            check=False,
-        )
-        if os.path.exists(gemini_review_path):
-            results["reviewers"]["gemini"] = {"status": "ok", "review": gemini_review_path}
-        elif os.path.exists(gemini_raw_path):
-            results["reviewers"]["gemini"] = {"status": "degraded", "raw": gemini_raw_path}
-        else:
-            results["reviewers"]["gemini"] = {"status": "failed"}
-    except subprocess.TimeoutExpired:
-        results["reviewers"]["gemini"] = {"status": "timeout"}
-    except Exception as e:
-        results["reviewers"]["gemini"] = {"status": "error", "message": str(e)}
+    if run_gemini:
+        gemini_script = os.path.join(SCRIPTS_DIR, "review-gemini.sh")
+        try:
+            subprocess.run(
+                ["bash", gemini_script, packet_gemini_path, gemini_raw_path],
+                timeout=300,
+                check=False,
+            )
+            if os.path.exists(gemini_review_path):
+                results["reviewers"]["gemini"] = {"status": "ok", "review": gemini_review_path}
+            elif os.path.exists(gemini_raw_path):
+                results["reviewers"]["gemini"] = {"status": "degraded", "raw": gemini_raw_path}
+            else:
+                results["reviewers"]["gemini"] = {"status": "failed"}
+        except subprocess.TimeoutExpired:
+            results["reviewers"]["gemini"] = {"status": "timeout"}
+        except Exception as e:
+            results["reviewers"]["gemini"] = {"status": "error", "message": str(e)}
+    else:
+        results["reviewers"]["gemini"] = {"status": "skipped"}
 
     print(json.dumps(results, indent=2))
 
@@ -388,6 +419,8 @@ def main():
     p_review.add_argument("--task-id", required=True, help="Task ID")
     p_review.add_argument("--round", type=int, default=None, help="Round number (omit if --impl)")
     p_review.add_argument("--impl", action="store_true", help="Run as implementation review (uses implementation-review/ folder)")
+    p_review.add_argument("--codex-only", action="store_true", help="Run only Codex reviewer")
+    p_review.add_argument("--gemini-only", action="store_true", help="Run only Gemini reviewer")
     p_review.add_argument("--content", default=None, help="Packet body (or pipe via stdin)")
 
     # new-round
