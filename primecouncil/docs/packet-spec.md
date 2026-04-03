@@ -29,6 +29,7 @@ Every packet must be self-contained enough to understand, but aggressively conci
 - Repeated protocol text (reviewers already have AGENTS.md)
 - Long project background (reference project-context.md instead)
 - Claude's own answer in first-pass review packets
+- Secrets, API keys, credentials, or personal/client-sensitive data
 
 ---
 
@@ -106,4 +107,4 @@ Packets in run folders follow this naming:
 - `claude-implementation-summary.md` — post-execution summary
 - `decision.md` — implementation review decision
 
-See `runs-spec.md` for full folder structure.
+See `runs-readme.md` for full folder structure.
