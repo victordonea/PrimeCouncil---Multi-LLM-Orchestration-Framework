@@ -21,6 +21,11 @@ mkdir -p "$OUTPUT_DIR"
 PROMPT="$(cat "$PROMPT_FILE")"
 TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
+# Read model from config.json (resolved relative to this script), fall back to default
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CONFIG_FILE="$SCRIPT_DIR/../config.json"
+GEMINI_MODEL="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('gemini_model', 'gemini-3.1-pro-preview'))" 2>/dev/null || echo "gemini-3.1-pro-preview")"
+
 # Derive normalized review filename: gemini-output-raw.md -> gemini-review.md
 REVIEW_FILE="$(echo "$OUTPUT_FILE" | sed 's/-output-raw\.md/-review.md/')"
 
@@ -37,7 +42,7 @@ extract_review() {
 }
 
 # Attempt 1
-if OUTPUT="$(gemini -p "$PROMPT" 2>&1)"; then
+if OUTPUT="$(gemini -m "$GEMINI_MODEL" -p "$PROMPT" 2>&1)"; then
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
   exit 0
@@ -46,7 +51,7 @@ fi
 echo "Gemini attempt 1 failed. Retrying..."
 
 # Attempt 2
-if OUTPUT="$(gemini -p "$PROMPT" 2>&1)"; then
+if OUTPUT="$(gemini -m "$GEMINI_MODEL" -p "$PROMPT" 2>&1)"; then
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
   exit 0

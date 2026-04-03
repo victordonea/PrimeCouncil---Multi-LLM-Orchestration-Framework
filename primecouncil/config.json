@@ -1,5 +1,7 @@
 {
   "codex_model": "gpt-5.4",
+  "codex_reasoning_effort": "high",
+  "gemini_model": "gemini-3.1-pro-preview",
   "runs_dir": "primecouncil/runs",
   "scripts_dir": "primecouncil/scripts",
   "templates_dir": "primecouncil/packets/templates",

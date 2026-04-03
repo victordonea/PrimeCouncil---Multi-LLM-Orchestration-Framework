@@ -25,6 +25,7 @@ TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/../config.json"
 CODEX_MODEL="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_model', 'gpt-5.4'))" 2>/dev/null || echo "gpt-5.4")"
+CODEX_REASONING="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_reasoning_effort', 'high'))" 2>/dev/null || echo "high")"
 
 # Derive normalized review filename: codex-output-raw.md -> codex-review.md
 REVIEW_FILE="$(echo "$OUTPUT_FILE" | sed 's/-output-raw\.md/-review.md/')"
@@ -42,7 +43,7 @@ extract_review() {
 }
 
 # Attempt 1
-if OUTPUT="$(codex exec -m "$CODEX_MODEL" --ephemeral "$PROMPT" 2>&1)"; then
+if OUTPUT="$(codex exec -m "$CODEX_MODEL" --ephemeral -c model_reasoning_effort="$CODEX_REASONING" "$PROMPT" 2>&1)"; then
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
   exit 0
@@ -51,7 +52,7 @@ fi
 echo "Codex attempt 1 failed. Retrying..."
 
 # Attempt 2
-if OUTPUT="$(codex exec -m "$CODEX_MODEL" --ephemeral "$PROMPT" 2>&1)"; then
+if OUTPUT="$(codex exec -m "$CODEX_MODEL" --ephemeral -c model_reasoning_effort="$CODEX_REASONING" "$PROMPT" 2>&1)"; then
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
   exit 0
