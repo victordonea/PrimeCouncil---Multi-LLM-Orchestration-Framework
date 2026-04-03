@@ -34,6 +34,7 @@ Claude presents synthesis + user input to Codex, Gemini, and himself. All three 
 
 ### Stage 8 — Final integration
 Claude produces the final STANDARD recommendation: recommended path, why it won, remaining minor tradeoffs, what user input changed, recommended next action.
+Note when all agents converge rapidly with no remaining disagreement — flag in the final recommendation if agreement may reflect groupthink rather than genuine convergence.
 
 ---
 
@@ -44,6 +45,7 @@ Same as STANDARD through the combined second-pass review.
 
 ### Stage 8 — Re-synthesis
 Claude creates updated synthesis. Explicitly tracks: what is now agreed, what is still disputed, what new insight appeared, what risks remain, whether convergence is increasing.
+Note when all agents converge rapidly with no remaining disagreement — flag in synthesis if agreement may reflect groupthink rather than genuine convergence.
 
 **Context compression:** Save synthesis as `current-state.md` at the task root (overwritten each round). In subsequent rounds, read only `current-state.md` + latest reviewer outputs — never re-read earlier round files.
 
