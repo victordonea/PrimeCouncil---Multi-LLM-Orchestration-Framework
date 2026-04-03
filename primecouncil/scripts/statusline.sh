@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# PrimeCouncil status line — displays orchestration state + session info
+# Receives session JSON on stdin from Claude Code
+
+input=$(cat)
+
+# Extract session info from Claude Code JSON
+MODEL=$(echo "$input" | jq -r '.model.display_name // "?"')
+CTX=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
+
+# Read orchestration state (resolve relative to this script)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+STATE_FILE="$SCRIPT_DIR/../orch-state.json"
+
+if [ -f "$STATE_FILE" ]; then
+  ORCH=$(python3 -c "import json; print(json.load(open('$STATE_FILE')).get('orch', 'off').upper())" 2>/dev/null || echo "OFF")
+  MODE=$(python3 -c "import json; print(json.load(open('$STATE_FILE')).get('default_mode', 'manual').upper())" 2>/dev/null || echo "MANUAL")
+else
+  ORCH="OFF"
+  MODE="MANUAL"
+fi
+
+if [ "$ORCH" = "ON" ]; then
+  echo "ORCH:$ORCH | MODE:$MODE | [$MODEL] ${CTX}% ctx"
+else
+  echo "ORCH:$ORCH | [$MODEL] ${CTX}% ctx"
+fi

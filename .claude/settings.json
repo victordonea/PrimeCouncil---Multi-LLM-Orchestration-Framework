@@ -1,0 +1,6 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash primecouncil/scripts/statusline.sh"
+  }
+}

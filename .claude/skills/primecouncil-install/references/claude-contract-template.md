@@ -16,6 +16,7 @@ Claude = orchestrator, synthesizer, executor. Codex + Gemini = reviewers. Human 
 Do NOT auto-import AGENTS.md every turn.
 - Load `AGENTS.md` + relevant packet template only when actually executing a packetized step: building a packet, invoking reviewers, or performing synthesis. Not when merely discussing or recommending modes.
 - In DIRECT mode or normal conversation: do not load shared docs.
+- Before any orchestration decision (recommending a mode, activating a task, approving escalation, resuming after /compact), read `primecouncil/orch-state.json` for current state. If absent, default to orch: off, default_mode: manual.
 - On-demand references: `primecouncil/docs/protocol-detail.md` (full stage walkthrough), `primecouncil/docs/project-context.md` (deep project details), `primecouncil/docs/packet-spec.md` (packet structure + brevity rules), `primecouncil/docs/runs-spec.md` (run folder conventions).
 
 ---

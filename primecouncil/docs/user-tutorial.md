@@ -26,6 +26,7 @@ Natural language works too: "go deep on this", "direct answer please", "let's do
 | `/primecouncil-install` | Setting up a new repo | Creates CLAUDE.md, ensures kit structure, fills project context |
 | `/prime-save` | After completing a task, or before `/clear` | Saves task-summary and/or updates project-progress (may save one, both, or neither depending on context) |
 | `/prime-resume` | Starting a new session, after `/clear` | Loads saved context, shows where you left off, suggests next action |
+| `/orch [on\|off\|standard\|deep\|manual\|status]` | Toggle orchestration state | Persists to `orch-state.json`, survives /compact and restarts |
 
 ---
 
@@ -120,6 +121,7 @@ When Claude asks for your input at checkpoints:
 | `primecouncil/docs/packet-spec.md` | Packet structure + brevity rules | When building packets |
 | `primecouncil/docs/protocol-detail.md` | Full STANDARD/DEEP stage walkthrough | When orchestration step runs |
 | `primecouncil/docs/runs-spec.md` | Run folder conventions | Reference only |
+| `primecouncil/orch-state.json` | Persistent ORCH on/off + default mode | Before orchestration decisions (gitignored, per-user) |
 
 ---
 
@@ -136,3 +138,28 @@ When Claude asks for your input at checkpoints:
 | `round-NN/synthesis.md` | Claude's synthesis |
 | `round-NN/final-recommendation.md` | Final integrated decision |
 | `implementation-review/` | Optional post-execution review |
+
+
+----------------------
+## Your modes explained with scenarios:
+
+ORCH OFF = Claude is just Claude. No orchestration awareness at all. You chat, Claude answers. No modes, no reviewers, no tasks. Like talking to vanilla Claude.
+
+ORCH ON + MODE MANUAL = Claude is orchestration-aware. When you give a substantial task, Claude says "This looks like it deserves STANDARD mode. Want to proceed?" But it WAITS for you to pick. It never auto-selects a mode. You decide every time.
+
+ORCH ON + MODE STANDARD = Claude is orchestration-aware AND defaults to STANDARD. When you give a substantial task, Claude says "Starting this in STANDARD mode" and goes. You don't have to pick each time. You can still override with GO DEEP or GO DIRECT on any specific task.
+
+ORCH ON + MODE DEEP = Same, but defaults to DEEP for every substantial task.
+
+The GO commands = One-shot overrides. You're in MODE STANDARD but you say GO DEEP for one particularly complex task. That task runs in DEEP. The next task goes back to your default (STANDARD).
+
+Practical example:
+
+
+You:    ORCH ON                    → Claude is aware, MODE defaults to MANUAL
+You:    /orch standard             → default mode is now STANDARD
+You:    "Build me a login system"  → Claude activates STANDARD automatically
+You:    "GO DEEP"                  → this specific task switches to DEEP
+        (task finishes)
+You:    "Add a logout button"      → back to STANDARD (the default)
+You:    /orch off                  → Claude goes back to vanilla mode
