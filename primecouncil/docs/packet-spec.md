@@ -22,7 +22,9 @@ Every packet must be self-contained enough to understand, but aggressively conci
 | Success criteria | 5 bullets max |
 | Reviewer questions | 3–5 max |
 | User preferences | only current relevant ones, not full history |
-| Synthesis sections | 10 bullets max per section |
+| Synthesis sections | aim for 10 per section — include more if dropping would lose a unique idea or its reasoning |
+
+**Synthesis exception:** Compactness matters, but never at the cost of dropping a unique perspective or reasoning from any reviewer. Deduplicate and merge similar points, but preserve every distinct idea.
 
 **Never include:**
 - Full chat history or transcript excerpts

@@ -366,9 +366,10 @@ def cmd_new_round(args):
         print(json.dumps({"status": "error", "message": f"Task dir not found: {task_dir}"}))
         sys.exit(1)
 
-    # Find next round number
-    existing = [d for d in os.listdir(task_dir) if d.startswith("round-")]
-    next_num = len(existing) + 1
+    # Find next round number (use max, not count, to handle gaps from deleted rounds)
+    round_dirs = [d for d in os.listdir(task_dir) if d.startswith("round-")]
+    max_num = max([int(d.split("-")[1]) for d in round_dirs], default=0)
+    next_num = max_num + 1
     round_dir = os.path.join(task_dir, f"round-{next_num:02d}")
     os.makedirs(round_dir, exist_ok=True)
 

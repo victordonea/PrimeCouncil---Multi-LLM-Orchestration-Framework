@@ -111,12 +111,15 @@ In DEEP mode round 2+, do NOT re-read all previous synthesis files. Instead:
 ## Reviewer output handling
 - The runner + scripts handle raw output saving and review extraction automatically.
 - After `review` returns, read only the `codex-review.md` and `gemini-review.md` files it points to.
-- Never read `*-output-raw.md` files. Those are audit-only.
-- If a reviewer returned `"degraded"`, note it in synthesis but continue.
+- `*-output-raw.md` files are audit-only, except when a reviewer is degraded and the normalized review is missing. In that case, inspect the raw output to decide whether it is usable or should be re-run.
+- If the raw output contains a usable review, use it cautiously and note the degraded state in synthesis. If it is a failure artifact, incomplete, or incoherent, recommend re-running that reviewer via `review --round N --codex-only` or `--gemini-only`.
 
 ## Escalation
 Do not auto-switch modes. If STANDARD needs DEEP, recommend it, explain why, wait for user confirmation.
 If work becomes a new task, recognize the shift, recommend mode, ask confirmation. Never silently switch.
+
+## Task reopening
+If a completed task needs revisiting: same objective and still relevant → reopen the existing task (do not call `init`). Update task.md status back to `active` and continue from the existing task folder. Materially new objective or significant time gap → create a new task.
 
 ## Execution
 Claude is the sole executor unless user changes that. Execute with momentum — handle normal turbulence yourself (small bugs, retries, test fixes, cleanup).

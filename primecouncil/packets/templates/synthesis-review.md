@@ -16,19 +16,19 @@
 ## Current synthesis
 
 ### Agreements
-[What all agents agree on. Max 10 bullets.]
+[What all agents agree on. Aim for 10 — include more if needed to preserve a unique idea or its reasoning.]
 
 ### Disagreements
-[Where views diverge. Max 10 bullets.]
+[Where views diverge. Aim for 10 — include more if needed to preserve a unique idea or its reasoning.]
 
 ### Strong ideas
-[Best ideas surfaced so far. Max 5 bullets.]
+[Best ideas surfaced so far. Aim for 5 — include more if needed to preserve a unique idea or its reasoning.]
 
 ### Remaining risks
-[Unresolved risks or concerns. Max 5 bullets.]
+[Unresolved risks or concerns. Aim for 5 — include more if needed to preserve a unique idea or its reasoning.]
 
 ### Unresolved tradeoffs
-[Tradeoffs not yet settled. Max 5 bullets.]
+[Tradeoffs not yet settled. Aim for 5 — include more if needed to preserve a unique idea or its reasoning.]
 
 ## User feedback so far
 [Classified: soft preference / hard directive / no preference. Only current relevant feedback.]

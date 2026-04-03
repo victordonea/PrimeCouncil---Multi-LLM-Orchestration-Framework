@@ -54,6 +54,14 @@ Codex and Gemini each produce an independent answer using the shared reviewer fo
 ### Stage 4 — Synthesis
 Claude synthesizes all three answers. Must preserve: agreements, disagreements, strong ideas, major risks, edge cases, alternatives, unresolved tradeoffs.
 
+**Synthesis preservation rules:**
+- Every unique idea from any reviewer must appear. Merge similar points, but never delete a unique one.
+- Disagreements must preserve each side's reasoning, not just the positions.
+- If an idea doesn't fit a category, create one. Don't force-fit or drop it.
+- Use lightweight source attribution in synthesis.md for readability:
+  [Codex] raised X — [Gemini] proposed Y — [Claude] initially preferred Z — [Shared] all three agreed on A
+- When converting synthesis into the round-2 reviewer packet, remove attribution. Keep ideas and reasoning only. Exception: include attribution only when source matters materially (e.g., minority concern, unresolved disagreement where reasoning lineage matters).
+
 ### Stage 5 — Human checkpoint
 Claude presents structured checkpoint via AskUserQuestion.
 Header: "Checkpoint" | Options:
@@ -78,6 +86,7 @@ Same as STANDARD through the combined second-pass review.
 
 ### Stage 7 — Re-synthesis
 Claude creates updated synthesis. Explicitly tracks: what is now agreed, what is still disputed, what new insight appeared, what risks remain, whether convergence is increasing.
+Apply the same synthesis preservation rules from Stage 4 (attribution, no dropping unique ideas, reasoning lineage).
 Note when all agents converge rapidly with no remaining disagreement — flag in synthesis if agreement may reflect groupthink rather than genuine convergence.
 
 **Context compression:** Save synthesis as `current-state.md` at the task root (overwritten each round). In subsequent rounds, read only `current-state.md` + latest reviewer outputs — never re-read earlier round files.
