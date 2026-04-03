@@ -31,7 +31,11 @@
 - [x] Step 20: User tutorial (primecouncil/docs/user-tutorial.md)
 
 ## Phase 7 — Hardening
-- [ ] Step 21: Config file for paths and models
+- [x] Step 21: Config file for paths and models
+  Create `primecouncil/config.json`. Centralizes: Codex model name, Gemini model, reviewer script paths, runs directory path, timeout values. Scripts and runner read from this instead of hardcoding.
 - [ ] Step 22: Failed run recovery
+  Runner detects partial state: packet exists but no review output. Status flags incomplete rounds. Support re-running a specific round without re-initializing. Runner-side only, zero token impact.
 - [ ] Step 23: Anti-groupthink guardrails
+  In round 2+ synthesis packets: reviewers must state what they CHANGED their mind on and why. Must flag if agreeing only because synthesis was persuasive. Claude notes in synthesis when all three agree suspiciously fast. ~2 lines added to templates.
 - [ ] Step 24: Structured checkpoints in orchestration
+  At human checkpoints during STANDARD/DEEP, Claude presents structured choices: Continue / Add preference / Add directive / Pause / Approve DEEP escalation / Close task. Add checkpoint format rules to CLAUDE.md.

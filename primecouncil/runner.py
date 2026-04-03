@@ -12,10 +12,41 @@ import os
 import subprocess
 import sys
 
-# Base paths
-RUNS_DIR = "primecouncil/runs"
-SCRIPTS_DIR = "primecouncil/scripts"
-TEMPLATES_DIR = "primecouncil/packets/templates"
+# Resolve config path relative to this file, not cwd
+_RUNNER_DIR = os.path.dirname(os.path.abspath(__file__))
+_REPO_ROOT = os.path.dirname(_RUNNER_DIR)
+_CONFIG_PATH = os.path.join(_RUNNER_DIR, "config.json")
+
+_DEFAULTS = {
+    "codex_model": "gpt-5.4",
+    "runs_dir": "primecouncil/runs",
+    "scripts_dir": "primecouncil/scripts",
+    "templates_dir": "primecouncil/packets/templates",
+    "review_timeout": 300,
+}
+
+
+def load_config():
+    """Load config.json with fallback defaults. Fail clearly if file exists but is malformed."""
+    if not os.path.exists(_CONFIG_PATH):
+        return dict(_DEFAULTS)
+    try:
+        with open(_CONFIG_PATH, "r", encoding="utf-8") as f:
+            user_config = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(json.dumps({"status": "error", "message": f"Malformed config.json: {e}"}), file=sys.stderr)
+        sys.exit(1)
+    merged = dict(_DEFAULTS)
+    merged.update(user_config)
+    return merged
+
+
+CONFIG = load_config()
+
+# Base paths (config values resolved to absolute via repo root)
+RUNS_DIR = os.path.join(_REPO_ROOT, CONFIG["runs_dir"])
+SCRIPTS_DIR = os.path.join(_REPO_ROOT, CONFIG["scripts_dir"])
+TEMPLATES_DIR = os.path.join(_REPO_ROOT, CONFIG["templates_dir"])
 
 
 def get_today():
@@ -232,7 +263,7 @@ def cmd_review(args):
         try:
             subprocess.run(
                 ["bash", codex_script, packet_codex_path, codex_raw_path],
-                timeout=300,
+                timeout=CONFIG["review_timeout"],
                 check=False,
             )
             if os.path.exists(codex_review_path):
@@ -254,7 +285,7 @@ def cmd_review(args):
         try:
             subprocess.run(
                 ["bash", gemini_script, packet_gemini_path, gemini_raw_path],
-                timeout=300,
+                timeout=CONFIG["review_timeout"],
                 check=False,
             )
             if os.path.exists(gemini_review_path):

@@ -1,0 +1,7 @@
+{
+  "codex_model": "gpt-5.4",
+  "runs_dir": "primecouncil/runs",
+  "scripts_dir": "primecouncil/scripts",
+  "templates_dir": "primecouncil/packets/templates",
+  "review_timeout": 300
+}
