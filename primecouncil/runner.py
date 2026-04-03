@@ -455,6 +455,44 @@ def cmd_status(args):
     print(json.dumps(result, indent=2))
 
 
+# ─── COMPLETE ────────────────────────────────────────────
+
+def cmd_complete(args):
+    """Mark a task as complete. Updates status and rounds count in task.md."""
+    task_dir = os.path.join(RUNS_DIR, args.task_id)
+    if not os.path.exists(task_dir):
+        print(json.dumps({"status": "error", "message": f"Task dir not found: {task_dir}"}))
+        sys.exit(1)
+
+    task_md_path = os.path.join(task_dir, "task.md")
+    if not os.path.exists(task_md_path):
+        print(json.dumps({"status": "error", "message": "task.md not found"}))
+        sys.exit(1)
+
+    # Count completed rounds
+    rounds = [d for d in os.listdir(task_dir) if d.startswith("round-")]
+
+    # Read and update task.md
+    with open(task_md_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    content = content.replace("- Status: active", "- Status: complete")
+    # Update rounds completed
+    for i in range(100):
+        content = content.replace(f"- Rounds completed: {i}", f"- Rounds completed: {len(rounds)}")
+
+    with open(task_md_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    result = {
+        "status": "ok",
+        "task_id": args.task_id,
+        "task_status": "complete",
+        "rounds_completed": len(rounds),
+    }
+    print(json.dumps(result, indent=2))
+
+
 # ─── LIST ─────────────────────────────────────────────────
 
 def cmd_list(args):
@@ -552,6 +590,10 @@ def main():
     p_status = subparsers.add_parser("status", help="Show task status")
     p_status.add_argument("--task-id", required=True, help="Task ID")
 
+    # complete
+    p_complete = subparsers.add_parser("complete", help="Mark a task as complete")
+    p_complete.add_argument("--task-id", required=True, help="Task ID")
+
     # list
     subparsers.add_parser("list", help="List all tasks with status and summary info")
 
@@ -567,6 +609,8 @@ def main():
         cmd_new_round(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "complete":
+        cmd_complete(args)
     elif args.command == "list":
         cmd_list(args)
     else:

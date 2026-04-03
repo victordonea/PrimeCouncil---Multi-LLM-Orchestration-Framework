@@ -76,6 +76,7 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 - `python primecouncil/runner.py review --task-id TASK_ID --round N --content "packet body"` → writes both reviewer packets, runs both scripts, returns JSON with paths to clean reviews. For implementation review use `--impl` instead of `--round N`.
 - `python primecouncil/runner.py new-round --task-id TASK_ID` → creates next round folder.
 - `python primecouncil/runner.py status --task-id TASK_ID` → shows files in each round.
+- `python primecouncil/runner.py complete --task-id TASK_ID` → marks task as complete, updates rounds count.
 
 **When to call the runner:**
 - On new task activation (STANDARD/DEEP): call `init`
@@ -83,6 +84,7 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 - To invoke reviewers: call `review` with the packet body (runner handles file creation + script execution)
 - After synthesis: call `save` with `synthesis.md`
 - For implementation review: call `review --impl`
+- On task completion: call `complete` (after post-execution summary and checkpoint)
 - Never create run folders or packet files manually.
 
 **Resuming after session reset / compaction:**
@@ -129,12 +131,17 @@ Claude is the sole executor unless user changes that. Execute with momentum — 
 Interrupt only when: permission boundary, material blocker, solution no longer viable, new architectural decision needed, material drift from plan, or user requested consultation. Signal execution start clearly.
 
 ## Post-execution summary
-After implementation, report to user before any optional review:
-1. **What was done** — changes, files, tests, status
-2. **What worked** — matched plan, smooth execution
-3. **What got complicated** — friction, workarounds, tradeoffs
-4. **What changed vs plan** — deviations, simplifications, postponements
-5. **Recommendation** — no review needed / implementation review recommended / reopen consensus
+The post-execution flow is mandatory after ANY implementation, regardless of complexity. Do not skip it for simple edits. Three chained steps:
+
+1. **Present the summary** to the user:
+   - What was done — changes, files, tests, status
+   - What worked — matched plan, smooth execution
+   - What got complicated — friction, workarounds, tradeoffs
+   - What changed vs plan — deviations, simplifications, postponements
+
+2. **Present the post-execution checkpoint** via AskUserQuestion (see protocol-detail.md).
+
+3. **Call `runner.py complete`** to mark the task done.
 
 If implementation review surfaces material disagreement, recommend reopening orchestration. This is rare — exception path only.
 
