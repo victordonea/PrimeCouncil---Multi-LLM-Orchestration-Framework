@@ -18,7 +18,7 @@ Every packet must be self-contained enough to understand, but aggressively conci
 | Objective | 3 lines max |
 | Scope | 5 lines max |
 | Constraints | 10 bullets max |
-| Relevant files | file path + one-line reason each |
+| Relevant files | file path + line range + one-line why-it-matters. Reviewers read these files directly. |
 | Success criteria | 5 bullets max |
 | Reviewer questions | 3–5 max |
 | User preferences | only current relevant ones, not full history |

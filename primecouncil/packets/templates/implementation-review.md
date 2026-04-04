@@ -31,6 +31,22 @@
 ## Reviewer questions
 [Specific questions for the reviewer. 3–5 max. Focus on deviations and risks.]
 
+## Relevant files (if needed)
+Read these files before answering. Focus on the specified line ranges first.
+If you need more context, explore beyond the specified ranges before deciding.
+Omit this section if the review is fully understandable from the summary and deviations above.
+
+- [file path, lines N–M] — [why it matters]
+
+## Before answering
+- Read the listed files first, focusing on the specified line ranges.
+- Treat those ranges as a starting point, not a hard boundary.
+- If they are insufficient for a confident assessment, read more of the same file or related files before deciding.
+- Do not finalize your judgment if you suspect important context is missing.
+- In your review, note briefly if you explored beyond the suggested ranges and why.
+- If you stayed within the suggested ranges, note that they were sufficient.
+- If context still feels insufficient, say exactly what file or section is missing.
+
 ## Required output format
 Use the reviewer format from AGENTS.md: Verdict, Strongest points, Risks/weaknesses, Recommended changes, Open questions, Confidence.
 

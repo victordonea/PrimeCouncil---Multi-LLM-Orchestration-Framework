@@ -36,6 +36,16 @@
 ## Reviewer focus for this round
 [What specifically to focus on now. 3–5 questions max. Should reflect what changed since last round, not restate everything.]
 
+## Before answering
+- If the packet references specific files, read them first, focusing on the specified line ranges.
+- Treat those ranges as a starting point, not a hard boundary.
+- If they are insufficient for a confident assessment, read more of the same file or related files before deciding.
+- Do not finalize your judgment if you suspect important context is missing.
+- In your review, note briefly if you explored beyond the suggested ranges and why.
+- If you stayed within the suggested ranges, note that they were sufficient.
+- If context still feels insufficient, say exactly what file or section is missing.
+- If no file references are included, confirm the packet itself was sufficient for your assessment.
+
 ## Required output format
 Use the reviewer format from AGENTS.md: Verdict, Strongest points, Risks/weaknesses, Recommended changes, Open questions, Confidence.
 
