@@ -232,6 +232,46 @@ def cmd_review(args):
         print(json.dumps({"status": "error", "message": f"Task dir not found: {task_dir}"}))
         sys.exit(1)
 
+    # ── Session management: load or create reviewer sessions ──
+    sessions_path = os.path.join(task_dir, "reviewer-sessions.json")
+    sessions = None
+    if os.path.exists(sessions_path):
+        try:
+            with open(sessions_path, "r", encoding="utf-8") as f:
+                sessions = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            sessions = None
+
+    # Read task status from task.md for guard rule
+    task_status = "unknown"
+    task_md_path = os.path.join(task_dir, "task.md")
+    if os.path.exists(task_md_path):
+        with open(task_md_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip().startswith("- Status:"):
+                    task_status = line.split(":", 1)[1].strip()
+                    break
+
+    # Guard rule: do not create reviewer sessions for non-active tasks
+    if task_status != "active":
+        print(json.dumps({"status": "error",
+                           "message": f"Task is not active (status: {task_status}). Reopen the task before reviewing."}))
+        sys.exit(1)
+
+    # Apply session guard: resume only if sessions are open
+    if sessions is None:
+        sessions = {"status": "open", "generation": 1,
+                     "codex_session_id": None, "gemini_session_id": None}
+    elif sessions.get("status") == "closed":
+        # Task was completed then reopened — fresh generation
+        sessions = {"status": "open",
+                     "generation": sessions.get("generation", 0) + 1,
+                     "codex_session_id": None, "gemini_session_id": None}
+    # else: sessions are open — resume existing sessions
+
+    codex_session_arg = sessions.get("codex_session_id") or ""
+    gemini_session_arg = sessions.get("gemini_session_id") or ""
+
     # Support implementation-review folder via --impl flag
     if args.impl:
         review_dir = os.path.join(task_dir, "implementation-review")
@@ -315,7 +355,7 @@ def cmd_review(args):
         codex_script = os.path.join(SCRIPTS_DIR, "review-codex.sh")
         try:
             subprocess.run(
-                ["bash", codex_script, packet_codex_path, codex_raw_path],
+                ["bash", codex_script, packet_codex_path, codex_raw_path, codex_session_arg],
                 timeout=CONFIG["review_timeout"],
                 check=False,
             )
@@ -337,7 +377,7 @@ def cmd_review(args):
         gemini_script = os.path.join(SCRIPTS_DIR, "review-gemini.sh")
         try:
             subprocess.run(
-                ["bash", gemini_script, packet_gemini_path, gemini_raw_path],
+                ["bash", gemini_script, packet_gemini_path, gemini_raw_path, gemini_session_arg],
                 timeout=CONFIG["review_timeout"],
                 check=False,
             )
@@ -353,6 +393,30 @@ def cmd_review(args):
             results["reviewers"]["gemini"] = {"status": "error", "message": str(e)}
     else:
         results["reviewers"]["gemini"] = {"status": "skipped"}
+
+    # ── Capture session IDs from scripts (partial failure guard: only update successful ones) ──
+    codex_session_file = os.path.join(review_dir, "codex-session.txt")
+    if run_codex and os.path.exists(codex_session_file):
+        with open(codex_session_file, "r", encoding="utf-8") as f:
+            sid = f.read().strip()
+            if sid:
+                sessions["codex_session_id"] = sid
+
+    gemini_session_file = os.path.join(review_dir, "gemini-session.txt")
+    if run_gemini and os.path.exists(gemini_session_file):
+        with open(gemini_session_file, "r", encoding="utf-8") as f:
+            sid = f.read().strip()
+            if sid:
+                sessions["gemini_session_id"] = sid
+
+    # Write updated sessions file
+    with open(sessions_path, "w", encoding="utf-8") as f:
+        json.dump(sessions, f, indent=2)
+
+    results["reviewer_sessions"] = {
+        "generation": sessions["generation"],
+        "status": sessions["status"],
+    }
 
     print(json.dumps(results, indent=2))
 
@@ -483,6 +547,18 @@ def cmd_complete(args):
 
     with open(task_md_path, "w", encoding="utf-8") as f:
         f.write(content)
+
+    # Close reviewer sessions
+    sessions_path = os.path.join(task_dir, "reviewer-sessions.json")
+    if os.path.exists(sessions_path):
+        try:
+            with open(sessions_path, "r", encoding="utf-8") as f:
+                sessions = json.load(f)
+            sessions["status"] = "closed"
+            with open(sessions_path, "w", encoding="utf-8") as f:
+                json.dump(sessions, f, indent=2)
+        except (json.JSONDecodeError, IOError):
+            pass
 
     result = {
         "status": "ok",
