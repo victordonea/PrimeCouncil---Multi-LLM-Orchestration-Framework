@@ -333,17 +333,26 @@ def cmd_review(args):
     if run_codex:
         stale_files.extend([codex_raw_path, codex_review_path])
     else:
-        # Skipped: remove old artifacts so round state is clean
-        for old in [packet_codex_path, codex_raw_path, codex_review_path]:
-            if os.path.exists(old):
-                os.remove(old)
+        # Skipped reviewer: preserve if any usable artifact exists (review OR raw output)
+        has_codex_artifact = (
+            (os.path.exists(codex_review_path) and os.path.getsize(codex_review_path) > 0) or
+            (os.path.exists(codex_raw_path) and os.path.getsize(codex_raw_path) > 0)
+        )
+        if not has_codex_artifact:
+            for old in [packet_codex_path, codex_raw_path, codex_review_path]:
+                if os.path.exists(old):
+                    os.remove(old)
     if run_gemini:
         stale_files.extend([gemini_raw_path, gemini_review_path])
     else:
-        # Skipped: remove old artifacts so round state is clean
-        for old in [packet_gemini_path, gemini_raw_path, gemini_review_path]:
-            if os.path.exists(old):
-                os.remove(old)
+        has_gemini_artifact = (
+            (os.path.exists(gemini_review_path) and os.path.getsize(gemini_review_path) > 0) or
+            (os.path.exists(gemini_raw_path) and os.path.getsize(gemini_raw_path) > 0)
+        )
+        if not has_gemini_artifact:
+            for old in [packet_gemini_path, gemini_raw_path, gemini_review_path]:
+                if os.path.exists(old):
+                    os.remove(old)
     for stale in stale_files:
         if os.path.exists(stale):
             os.remove(stale)
