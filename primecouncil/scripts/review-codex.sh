@@ -31,6 +31,10 @@ CODEX_REASONING="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')
 # Session ID file — written next to raw output for runner to capture
 SESSION_FILE="$OUTPUT_DIR/codex-session.txt"
 
+# Temp file for -o output (plain text review). Cleaned up on all exit paths.
+REVIEW_TMP="$OUTPUT_DIR/codex-review-tmp.txt"
+trap 'rm -f "$REVIEW_TMP"' EXIT
+
 # Derive normalized review filename: codex-output-raw.md -> codex-review.md
 REVIEW_FILE="$(echo "$OUTPUT_FILE" | sed 's/-output-raw\.md/-review.md/')"
 
@@ -46,43 +50,60 @@ extract_review() {
   fi
 }
 
-# Extract session ID from Codex output header
-# PROVISIONAL: parses human-readable header. Future hardening: use --json
-# with thread.started.thread_id for machine-readable capture.
+# Extract session ID from JSONL stdout (machine-readable, stable contract)
 extract_session_id() {
-  local raw="$1"
+  local jsonl_output="$1"
   local sid
-  sid="$(echo "$raw" | grep -oP 'session id: \K[0-9a-f-]+' | head -1)" || true
+  sid="$(echo "$jsonl_output" | python3 -c "
+import json, sys
+for line in sys.stdin:
+    try:
+        d = json.loads(line)
+        if d.get('type') == 'thread.started':
+            print(d.get('thread_id', ''))
+            break
+    except: pass
+" 2>/dev/null || echo "")"
   if [ -n "$sid" ]; then
     echo "$sid" > "$SESSION_FILE"
     echo "Session ID captured: $sid"
   fi
 }
 
-# Build the codex command (resume or fresh — no --ephemeral so sessions persist)
+# Run Codex with --json (JSONL on stdout) and -o (plain text review to file)
 run_codex() {
+  # Clear stale temp file before each attempt
+  rm -f "$REVIEW_TMP"
   if [ -n "$RESUME_SESSION" ]; then
-    codex exec resume "$RESUME_SESSION" -m "$CODEX_MODEL" -c model_reasoning_effort="$CODEX_REASONING" "$PROMPT" 2>&1
+    codex exec resume "$RESUME_SESSION" -m "$CODEX_MODEL" -c model_reasoning_effort="$CODEX_REASONING" --json -o "$REVIEW_TMP" "$PROMPT" 2>&1
   else
-    codex exec -m "$CODEX_MODEL" -c model_reasoning_effort="$CODEX_REASONING" "$PROMPT" 2>&1
+    codex exec -m "$CODEX_MODEL" -c model_reasoning_effort="$CODEX_REASONING" --json -o "$REVIEW_TMP" "$PROMPT" 2>&1
+  fi
+  # Verify -o produced non-empty output
+  if [ ! -s "$REVIEW_TMP" ]; then
+    echo "Codex succeeded but -o file is empty or missing" >&2
+    return 1
   fi
 }
 
 # Attempt 1
-if OUTPUT="$(run_codex)"; then
+if JSONL_OUTPUT="$(run_codex)"; then
+  # Review text is in the -o file (plain text)
+  OUTPUT="$(cat "$REVIEW_TMP" 2>/dev/null || echo "")"
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
-  extract_session_id "$OUTPUT"
+  extract_session_id "$JSONL_OUTPUT"
   exit 0
 fi
 
 echo "Codex attempt 1 failed. Retrying..."
 
 # Attempt 2
-if OUTPUT="$(run_codex)"; then
+if JSONL_OUTPUT="$(run_codex)"; then
+  OUTPUT="$(cat "$REVIEW_TMP" 2>/dev/null || echo "")"
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
-  extract_session_id "$OUTPUT"
+  extract_session_id "$JSONL_OUTPUT"
   exit 0
 fi
 
