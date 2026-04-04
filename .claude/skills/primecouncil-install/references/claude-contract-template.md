@@ -141,7 +141,7 @@ The post-execution flow is mandatory after ANY implementation, regardless of com
 
 2. **Present the post-execution checkpoint** via AskUserQuestion (see protocol-detail.md).
 
-3. **Call `runner.py complete`** to mark the task done.
+3. **If the user accepts completion** (Looks good), call `runner.py complete` to mark the task done. If the user chooses Run review or Reopen, do not call `complete` — the task remains active until review is resolved or the reopened discussion concludes.
 
 If implementation review surfaces material disagreement, recommend reopening orchestration. This is rare — exception path only.
 
