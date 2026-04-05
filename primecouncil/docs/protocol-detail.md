@@ -29,10 +29,10 @@ Header: "Mode" | Options:
 ### Post-execution checkpoint
 *After implementation + execution summary. Separate from the decision protocol stages.*
 Header: "Next step" | Options:
-- **Looks good** — No review needed
-- **Run review** — Send to reviewers for implementation review
-- **Reopen** — Revisit the approach
-*Follow-on: Looks good → task complete, recommend save. Run review → Claude builds impl review packet. Reopen → Claude recommends mode for the issue.*
+- **Accept & close task** — Implementation approved, mark task complete
+- **Send implementation to reviewers** — Codex and Gemini review what was built
+- **Rethink this** — Go back and revisit the approach
+*Follow-on: Accept & close task → call runner.py complete, recommend save. Send implementation to reviewers → Claude builds impl review packet. Rethink this → Claude recommends mode for the issue.*
 
 ---
 

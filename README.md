@@ -42,15 +42,17 @@ Each reviewer works independently before seeing the others' answers. This preven
 
 ```
 your-project/
-  CLAUDE.md                    # Part 1: orchestration rules, Part 2: project context
+  CLAUDE.md                    # Project identity + PrimeCouncil managed tripwire block
   AGENTS.md                    # Shared reviewer constitution
   GEMINI.md                    # Gemini-specific reviewer instructions
-  .claude/skills/              # PrimeCouncil skills (install, save, resume)
+  .claude/skills/              # PrimeCouncil skills (install, save, resume, orch)
   primecouncil/
+    ORCHESTRATION.md           # Full orchestration contract (loaded on demand)
     runner.py                  # Mechanical automation (folders, packets, reviewers)
-    scripts/                   # Reviewer CLI adapters
+    config.json                # Centralized paths, models, timeouts
+    scripts/                   # Reviewer CLI adapters + statusline
     packets/templates/         # Packet templates for each review type
-    docs/                      # Protocol details, project context, specs
+    docs/                      # Protocol details, project context, specs, host-repo pattern
     runs/                      # Task history — one folder per task
 ```
 

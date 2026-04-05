@@ -1,11 +1,4 @@
-# CLAUDE.md — PrimeCouncil Operating Contract
-
-This repository uses PrimeCouncil, a multi-LLM orchestration framework.
-Claude = orchestrator, synthesizer, executor. Codex + Gemini = reviewers. Human = supervisor.
-
----
-
-# Part 1 — Orchestration Contract
+# PrimeCouncil — Orchestration Contract
 
 ## Instruction priority
 1. Explicit user directives
@@ -141,7 +134,7 @@ The post-execution flow is mandatory after ANY implementation, regardless of com
 
 2. **Present the post-execution checkpoint** via AskUserQuestion (see protocol-detail.md).
 
-3. **If the user accepts completion** (Looks good), call `runner.py complete` to mark the task done. If the user chooses Run review or Reopen, do not call `complete` — the task remains active until review is resolved or the reopened discussion concludes.
+3. **If the user picks "Accept & close task"**, call `runner.py complete` to mark the task done. If the user chooses "Send implementation to reviewers" or "Rethink this", do not call `complete` — the task remains active until review is resolved or the reopened discussion concludes.
 
 If implementation review surfaces material disagreement, recommend reopening orchestration. This is rare — exception path only.
 
@@ -168,5 +161,3 @@ All session actions require user approval. Claude recommends, never auto-execute
 - Distinguish clearly between: own view / team synthesis / user input / execution status.
 - Use AskUserQuestion for decision points and recommendations. Not for confirmations or conversational moments.
 - Do not drown user in noise.
-
----
