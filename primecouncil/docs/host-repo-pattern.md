@@ -8,6 +8,16 @@ How PrimeCouncil integrates with any repository.
 
 PrimeCouncil is a **guest** in your repo, not the owner. The root `CLAUDE.md` belongs to the project. PrimeCouncil adds a small managed block at the bottom.
 
+## The Two-File Pattern
+
+Every host repo uses two files for project knowledge:
+
+1. **`CLAUDE.md`** — the **behavior file** (50-200 lines). Tells Claude how to behave in this repo. Contains project identity, stack, key boundaries, rules, and the managed PrimeCouncil tripwire block. Always loaded.
+
+2. **`docs/project-context.md`** — the **reference file** (optional, any length). Gives Claude and the user a comprehensive understanding of the project. Should be structured, detailed, and reusable. Created during install if the user wants it.
+
+Project context belongs to the **host repo** (`docs/project-context.md`), not to the PrimeCouncil kit. PrimeCouncil does not own or manage this file — it only helps generate it during install.
+
 ## What root CLAUDE.md looks like
 
 ```
@@ -89,7 +99,7 @@ It should **not** be loaded merely because orchestration was turned on. This avo
 | Reviewer rules | `AGENTS.md` | On demand (during reviewer/packetized steps only) |
 | Gemini-specific rules | `GEMINI.md` | On demand (during Gemini reviewer invocation) |
 | Orchestration state | `primecouncil/orch-state.json` | Checked before orchestration decisions |
-| Detailed project context | `primecouncil/docs/project-context.md` | On demand |
+| Detailed project context | `docs/project-context.md` (optional) | On demand, if present |
 | Domain-specific rules (e.g. n8n) | `docs/` or `.claude/rules/` | On demand or path-scoped |
 
 ## Installer behavior

@@ -2,7 +2,7 @@
 
 This file is the shared source of truth for all PrimeCouncil reviewers.
 For full protocol stage details, see `primecouncil/docs/protocol-detail.md`.
-For project-specific context, see `primecouncil/docs/project-context.md`.
+If present, see `docs/project-context.md` for project-specific context.
 
 ---
 

@@ -29,7 +29,7 @@ Every packet must be self-contained enough to understand, but aggressively conci
 **Never include:**
 - Full chat history or transcript excerpts
 - Repeated protocol text (reviewers already have AGENTS.md)
-- Long project background (reference project-context.md instead)
+- Long project background (reference docs/project-context.md if present)
 - Claude's own answer in first-pass review packets
 - Secrets, API keys, credentials, or personal/client-sensitive data
 

@@ -22,7 +22,7 @@ Framework complete. Post-first-run hardening done. Ready for production use.
 - AGENTS.md is shared reviewer constitution — loaded on demand, not every turn
 - All reviewer output saved as artifacts — raw + normalized reviews
 
-For full project architecture details, see `primecouncil/docs/project-context.md`.
+For full project architecture details, see `docs/project-context.md` if present.
 
 <!-- PRIMECOUNCIL:START - Do not edit this section manually -->
 ## PrimeCouncil

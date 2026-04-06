@@ -95,7 +95,6 @@ primecouncil/
       task-summary.md
   docs/
     protocol-detail.md
-    project-context.md
     packet-spec.md
     runs-spec.md
     host-repo-pattern.md
@@ -109,14 +108,42 @@ Also ensure at repo root:
 
 If the `primecouncil/` folder doesn't exist, tell the user to copy the PrimeCouncil kit into the repo first.
 
-## Step 6 — Fill project context (first install only)
+## Step 6 — Project context (optional)
 
-Only if the installer just created a new CLAUDE.md with placeholders (Step 1, "no CLAUDE.md exists" path):
-1. Ask the user to briefly describe: project purpose, stack, key conventions.
-2. Write project content above the PrimeCouncil markers (keep under 50 lines).
-3. Write detailed version to `primecouncil/docs/project-context.md`.
+Project context lives at `docs/project-context.md` in the host repo, NOT inside `primecouncil/docs/`.
+It is optional — the user decides whether to create it.
 
-If CLAUDE.md already existed with project content above the markers, do NOT modify it. The project content belongs to the host repo. If the user wants to update it, they do it themselves or ask explicitly.
+**6a. If `docs/project-context.md` already exists**, present via AskUserQuestion:
+Header: "Project context" | Options:
+- **Keep existing** — don't touch it
+- **Refresh** — update with a new scan while preserving structure
+- **Overwrite** — replace entirely with fresh generation
+
+If "Keep existing" → skip to Step 7.
+
+**6b. If no file exists (or user chose Refresh/Overwrite)**, present via AskUserQuestion:
+Header: "Project context" | Options:
+- **Selective scan** — scan important files, follow references recursively
+- **Full scan** — scan the whole repo (excluding generated/irrelevant dirs)
+- **Skip** — no project context file
+
+If "Skip" → continue to Step 7.
+
+**6c. Selective scan behavior:**
+- Start with anchor files: README.md, root docs, architecture/spec files, config/build files, existing CLAUDE.md, major directories referenced by docs
+- Recursively follow referenced files only when they materially improve understanding
+- Do not blindly read the entire repo
+
+**6d. Full scan behavior:**
+- Scan the repo broadly, but **exclude**: `.git/`, `node_modules/`, `dist/`, `build/`, `__pycache__/`, `.next/`, `primecouncil/runs/`, lock files, binaries, media, generated/cache folders
+- Focus on source files, docs, and config
+
+**6e. Generate** `docs/project-context.md` using the template from `references/project-context-template.md`. The generated file should be comprehensive and high-value — not a lightweight placeholder.
+
+**6f. If the installer created a new CLAUDE.md** (Step 1, "no CLAUDE.md exists" path):
+- Ask the user to briefly describe: project purpose, stack, key conventions
+- Write project content above the PrimeCouncil markers (keep under 50 lines)
+- If CLAUDE.md already existed with project content, do NOT modify it
 
 ## Step 7 — Confirm
 

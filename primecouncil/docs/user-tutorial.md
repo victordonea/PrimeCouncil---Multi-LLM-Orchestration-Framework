@@ -260,7 +260,7 @@ When Claude asks for your input at checkpoints:
 | `primecouncil/ORCHESTRATION.md` | Full orchestration contract | On demand (when orch is active) |
 | `AGENTS.md` | Shared reviewer constitution | When orchestration step runs |
 | `GEMINI.md` | Gemini-specific instructions | When Gemini CLI is invoked |
-| `primecouncil/docs/project-context.md` | Deep project details | On demand for complex tasks |
+| `docs/project-context.md` | Deep project details (host repo, optional) | On demand if present |
 | `primecouncil/docs/project-progress.md` | Project story across sessions | By `/prime-resume` and `/prime-save` |
 | `primecouncil/docs/packet-spec.md` | Packet structure + brevity rules | When building packets |
 | `primecouncil/docs/protocol-detail.md` | Full STANDARD/DEEP stage walkthrough | When orchestration step runs |
