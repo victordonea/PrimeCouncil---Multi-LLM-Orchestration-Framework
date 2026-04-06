@@ -14,7 +14,7 @@ Framework complete. Post-first-run hardening done. Ready for production use.
 
 ## Key directories
 - `primecouncil/` — runner, scripts, config, templates, docs, run history
-- `.claude/skills/` — orch, prime-save, prime-resume, primecouncil-install
+- `.claude/skills/` — prime-orch, prime-save, prime-resume, prime-install
 - `primecouncil/docs/` — protocol detail, packet spec, runs spec, project context
 
 ## Key conventions
@@ -29,7 +29,7 @@ For full project architecture details, see `docs/project-context.md` if present.
 
 Before orchestration decisions, read `primecouncil/orch-state.json`.
 If missing, default to `{"orch": "off", "default_mode": "manual"}`.
-`/orch` is the canonical activation path; natural language commands are aliases.
+`/prime-orch` is the canonical activation path; natural language commands are aliases.
 
 `ORCH ON/OFF`, `MODE MANUAL/STANDARD/DEEP` → update `orch-state.json`.
 `GO STANDARD/DEEP/DIRECT` → task-scoped only, do NOT update `orch-state.json`.

@@ -40,7 +40,7 @@ Copy these into your project's root folder:
 
 Open your project in Claude Code and type:
 ```
-/primecouncil-install
+/prime-install
 ```
 
 The installer will:
@@ -57,9 +57,9 @@ PrimeCouncil is **off by default**. Claude works normally until you turn it on.
 
 To activate, type any of these:
 ```
-/orch on          ← recommended way
+/prime-orch on          ← recommended way
 ORCH ON           ← also works
-/orch standard    ← turns on + defaults to STANDARD mode
+/prime-orch standard    ← turns on + defaults to STANDARD mode
 ```
 
 You'll see a confirmation message and the status line at the bottom will show `ORCH:ON`.
@@ -107,11 +107,11 @@ This gives you a **full closed loop** for every task: the team plans together, C
 
 | What you want | What to say |
 |---|---|
-| Turn on orchestration | `/orch on` or `ORCH ON` |
-| Turn it off | `/orch off` or `ORCH OFF` |
-| Set default mode | `/orch standard` or `/orch deep` or `/orch manual` |
+| Turn on orchestration | `/prime-orch on` or `ORCH ON` |
+| Turn it off | `/prime-orch off` or `ORCH OFF` |
+| Set default mode | `/prime-orch standard` or `/prime-orch deep` or `/prime-orch manual` |
 | Override mode for one task | `GO STANDARD` or `GO DEEP` or `GO DIRECT` |
-| Check current state | `/orch status` |
+| Check current state | `/prime-orch status` |
 | Save progress before clearing | `/prime-save` |
 | Resume after a break | `/prime-resume` |
 
@@ -129,12 +129,12 @@ This gives you a **full closed loop** for every task: the team plans together, C
 
 **Example session:**
 ```
-You:    /orch standard             → orchestration on, defaults to STANDARD
+You:    /prime-orch standard             → orchestration on, defaults to STANDARD
 You:    "Design the API endpoint"  → Claude activates STANDARD automatically
 You:    "GO DEEP"                  → this specific task switches to DEEP
         (task finishes)
 You:    "Add error handling"       → back to STANDARD (your default)
-You:    /orch off                  → back to vanilla Claude
+You:    /prime-orch off                  → back to vanilla Claude
 ```
 
 ---
@@ -162,10 +162,10 @@ Natural language works too: "go deep on this", "direct answer please", "let's do
 
 | Skill | When to use | What it does |
 |---|---|---|
-| `/primecouncil-install` | Setting up a new repo | Adds PrimeCouncil managed block to CLAUDE.md, creates orchestration contract |
+| `/prime-install` | Setting up a new repo | Adds PrimeCouncil managed block to CLAUDE.md, creates orchestration contract |
 | `/prime-save` | After completing a task, or before `/clear` | Saves task-summary and/or updates project-progress |
 | `/prime-resume` | Starting a new session, after `/clear` | Loads saved context, shows where you left off, suggests next action |
-| `/orch [on\|off\|standard\|deep\|manual\|status]` | Toggle orchestration state | Persists to `orch-state.json`, survives /compact and restarts |
+| `/prime-orch [on\|off\|standard\|deep\|manual\|status]` | Toggle orchestration state | Persists to `orch-state.json`, survives /compact and restarts |
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: primecouncil-install
+name: prime-install
 description: Install or update the PrimeCouncil multi-LLM orchestration framework in the current repository. Use this skill when the user says "install primecouncil", "set up orchestration", "add primecouncil to this repo", or when the primecouncil/ folder exists but CLAUDE.md is missing the PrimeCouncil managed block.
 ---
 
@@ -33,7 +33,7 @@ The generic PrimeCouncil tripwire block to insert/update (from the host-repo pat
 
 Before orchestration decisions, read `primecouncil/orch-state.json`.
 If missing, default to `{"orch": "off", "default_mode": "manual"}`.
-`/orch` is the canonical activation path; natural language commands are aliases.
+`/prime-orch` is the canonical activation path; natural language commands are aliases.
 
 `ORCH ON/OFF`, `MODE MANUAL/STANDARD/DEEP` → update `orch-state.json`.
 `GO STANDARD/DEEP/DIRECT` → task-scoped only, do NOT update `orch-state.json`.
@@ -149,7 +149,7 @@ If "Skip" → continue to Step 7.
 
 Tell the user:
 - PrimeCouncil is installed.
-- Say `ORCH ON` or `/orch on` to activate orchestration.
+- Say `ORCH ON` or `/prime-orch on` to activate orchestration.
 - Chat normally for direct work.
 - The full orchestration contract is in `primecouncil/ORCHESTRATION.md` (loaded on demand).
 - Update project context anytime by saying "update project context."

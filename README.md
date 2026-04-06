@@ -22,7 +22,7 @@ Each reviewer works independently before seeing the others' answers. This preven
 1. Copy the `primecouncil/` folder and `.claude/skills/` into your project repo
 2. Copy `AGENTS.md` and `GEMINI.md` to your repo root
 3. Open Claude Code in the repo
-4. Run `/primecouncil-install` — it sets up CLAUDE.md and fills in your project context
+4. Run `/prime-install` — it sets up CLAUDE.md and fills in your project context
 5. Say `ORCH ON` and start working
 
 ## Commands
@@ -36,7 +36,7 @@ Each reviewer works independently before seeing the others' answers. This preven
 | `GO DIRECT` | Handle it directly, no reviewers |
 | `/prime-save` | Save task and project context before clearing |
 | `/prime-resume` | Restore context in a new session |
-| `/primecouncil-install` | Set up PrimeCouncil in a new repo |
+| `/prime-install` | Set up PrimeCouncil in a new repo |
 
 ## File structure
 
@@ -45,7 +45,7 @@ your-project/
   CLAUDE.md                    # Project identity + PrimeCouncil managed tripwire block
   AGENTS.md                    # Shared reviewer constitution
   GEMINI.md                    # Gemini-specific reviewer instructions
-  .claude/skills/              # PrimeCouncil skills (install, save, resume, orch)
+  .claude/skills/              # PrimeCouncil skills (prime-orch, prime-save, prime-resume, prime-install)
   primecouncil/
     ORCHESTRATION.md           # Full orchestration contract (loaded on demand)
     runner.py                  # Mechanical automation (folders, packets, reviewers)

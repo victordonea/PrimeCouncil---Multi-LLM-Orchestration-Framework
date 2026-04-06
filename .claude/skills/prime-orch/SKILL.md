@@ -1,17 +1,17 @@
 ---
-name: orch
-description: Toggle PrimeCouncil orchestration state. Use /orch on, /orch off, /orch standard, /orch deep, /orch manual, or /orch status.
+name: prime-orch
+description: Toggle PrimeCouncil orchestration state. Use /prime-orch on, /prime-orch off, /prime-orch standard, /prime-orch deep, /prime-orch manual, or /prime-orch status.
 disable-model-invocation: true
 argument-hint: [on|off|standard|deep|manual|status]
 ---
 
-# /orch — Orchestration State Control
+# /prime-orch — Orchestration State Control
 
-Manage persistent orchestration state in `primecouncil/orch-state.json`.
+Manage persistent orchestration state in `primecouncil/prime-orch-state.json`.
 
 ## Read current state first
 
-Read `primecouncil/orch-state.json`. If it doesn't exist, treat current state as `{"orch": "off", "default_mode": "manual"}`.
+Read `primecouncil/prime-orch-state.json`. If it doesn't exist, treat current state as `{"orch": "off", "default_mode": "manual"}`.
 
 ## Handle the command: `$ARGUMENTS`
 
@@ -35,11 +35,11 @@ Read and display the current state. Do not modify anything.
 Format: "Orchestration: [on/off] | Default mode: [mode]"
 
 ### No argument or unrecognized
-Show usage: `/orch [on|off|standard|deep|manual|status]`
+Show usage: `/prime-orch [on|off|standard|deep|manual|status]`
 
 ## Write the updated state
 
-Write the updated JSON to `primecouncil/orch-state.json`:
+Write the updated JSON to `primecouncil/prime-orch-state.json`:
 ```json
 {
   "orch": "...",

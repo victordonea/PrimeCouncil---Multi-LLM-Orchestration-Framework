@@ -65,7 +65,7 @@ The root `CLAUDE.md` should **NOT:**
 The installer manages this. It contains:
 
 - Instruction to read `primecouncil/orch-state.json` before any orchestration decision
-- `/orch` is the canonical activation/state-control path; natural language commands (`ORCH ON`, `MODE STANDARD`, etc.) are aliases to the same state model
+- `/prime-orch` is the canonical activation/state-control path; natural language commands (`ORCH ON`, `MODE STANDARD`, etc.) are aliases to the same state model
 - Write rules that update `orch-state.json`:
   - `ORCH ON`, `MODE MANUAL/STANDARD/DEEP` → update persistent state in orch-state.json
   - `ORCH OFF` → update state and exit orchestration-aware mode; no contract loading needed
@@ -120,7 +120,7 @@ That means:
 2. Write your project-first `CLAUDE.md` (just the project content — no PrimeCouncil block)
 3. Copy the `primecouncil/` folder into the repo
 4. Copy `AGENTS.md` and `GEMINI.md` to repo root
-5. Run `/primecouncil-install`
+5. Run `/prime-install`
 6. The installer adds the managed tripwire block to your existing `CLAUDE.md`
 7. Say `ORCH ON` to activate when needed
 
