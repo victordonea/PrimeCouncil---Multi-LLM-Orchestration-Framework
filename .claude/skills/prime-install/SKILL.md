@@ -145,14 +145,37 @@ If "Skip" → continue to Step 7.
 - Write project content above the PrimeCouncil markers (keep under 50 lines)
 - If CLAUDE.md already existed with project content, do NOT modify it
 
-## Step 7 — Confirm
+## Step 7 — Confirm and show quickstart
 
-Tell the user:
-- PrimeCouncil is installed.
-- Say `ORCH ON` or `/prime-orch on` to activate orchestration.
-- Chat normally for direct work.
-- The full orchestration contract is in `primecouncil/ORCHESTRATION.md` (loaded on demand).
-- Update project context anytime by saying "update project context."
+Present a clear quickstart message to the user:
+
+```
+✅ PrimeCouncil is installed!
+
+QUICK START:
+1. Turn on orchestration:  /prime-orch on
+2. Set your default mode:  /prime-orch standard  (or deep, or manual)
+3. Describe a task normally — Claude will take it from there
+
+HOW A TASK WORKS:
+You describe what you need — a decision, a design, a feature, a fix.
+Claude recognizes it as a task and kicks off the orchestration:
+- Claude writes its own first-pass analysis
+- Codex (ChatGPT) and Gemini review independently — they can't see Claude's answer
+- Claude synthesizes all three perspectives into one picture
+- You get a checkpoint to add your input or continue
+- A second round of review happens with the combined view
+- Claude produces the final recommendation and executes
+- After execution, you choose: accept & close, send to reviewers, or rethink
+
+KEY COMMANDS:
+- /prime-orch on/off/standard/deep/manual/status — control orchestration
+- /prime-save — save progress before /clear or restart
+- /prime-resume — pick up where you left off
+- ORCH ON, GO STANDARD, GO DEEP — natural language also works
+
+📖 Full guide: primecouncil/docs/user-tutorial.md
+```
 
 ## Rules
 - **Never overwrite the whole CLAUDE.md.** Only insert/update the managed block.
