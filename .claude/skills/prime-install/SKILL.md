@@ -55,14 +55,7 @@ read `primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode.
 <!-- PRIMECOUNCIL:END -->
 ```
 
-## Step 3 — Create or update ORCHESTRATION.md
-
-Write the full orchestration contract to `primecouncil/ORCHESTRATION.md`.
-Use the template from `references/orchestration-template.md` in this skill.
-
-If `primecouncil/ORCHESTRATION.md` already exists, overwrite it with the latest template (the contract is canonical — updates are safe).
-
-## Step 4 — Create default orch-state.json
+## Step 3 — Create default orch-state.json
 
 If `primecouncil/orch-state.json` does not exist, create it:
 ```json
