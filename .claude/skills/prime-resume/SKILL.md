@@ -51,7 +51,7 @@ Present one concise brief to the user with this structure:
 
 ## Step 4 — Ask the user
 
-After presenting the brief, present options via AskUserQuestion.
+After presenting the brief, present options as numbered choices in chat.
 Header: "Resume" | Options:
 - **Continue [task]** — Resume most recent task
 - **Switch task** — Pick a different one

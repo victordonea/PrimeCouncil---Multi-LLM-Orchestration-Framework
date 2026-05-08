@@ -21,7 +21,7 @@ Determine the current situation:
 - Priorities or blockers changed
 - Direction shifted
 
-Present save options via AskUserQuestion.
+Present save options as numbered choices in chat.
 Header: "Save" | Options:
 - **Save task summary** — Resume point for this task
 - **Save project progress** — Project-level story update

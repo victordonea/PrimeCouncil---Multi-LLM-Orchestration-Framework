@@ -5,11 +5,11 @@ Load this only when actually executing a packetized orchestration step.
 
 ---
 
-## Structured checkpoints — AskUserQuestion
+## Structured checkpoints
 
-All decision points use AskUserQuestion with clickable options. Design rules:
+All decision points are presented as numbered options in chat. Design rules:
 - Only for real decision points, not confirmations or conversational moments.
-- Do not present AskUserQuestion if the path is already explicit (user said "GO DEEP" → no mode picker).
+- Do not present options if the path is already explicit (user said "GO DEEP" → no picker).
 - If the user responds via "Other" or free text, Claude still classifies it as soft preference / hard directive / no preference.
 - Session actions (/clear, /compact) are user-triggered — Claude prepares save flow if needed, then prompts user to perform the action.
 
@@ -63,7 +63,7 @@ Claude synthesizes all three answers. Must preserve: agreements, disagreements, 
 - When converting synthesis into the round-2 reviewer packet, remove attribution. Keep ideas and reasoning only. Exception: include attribution only when source matters materially (e.g., minority concern, unresolved disagreement where reasoning lineage matters).
 
 ### Stage 5 — Human checkpoint
-Claude presents structured checkpoint via AskUserQuestion.
+Claude presents structured checkpoint as numbered options in chat.
 Header: "Checkpoint" | Options:
 - **Continue** — Proceed to combined review
 - **Add preference** — Soft input that influences direction
@@ -92,7 +92,7 @@ Note when all agents converge rapidly with no remaining disagreement — flag in
 **Context compression:** Save synthesis as `current-state.md` at the task root (overwritten each round). In subsequent rounds, read only `current-state.md` + latest reviewer outputs — never re-read earlier round files.
 
 ### Stage 8 — Human checkpoint
-Claude presents structured checkpoint via AskUserQuestion.
+Claude presents structured checkpoint as numbered options in chat.
 Header: "Checkpoint" | Options:
 - **Continue** — Another review round
 - **Add preference** — Soft input

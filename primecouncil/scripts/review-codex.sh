@@ -25,8 +25,10 @@ TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 # Read config from config.json (resolved relative to this script)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/../config.json"
-CODEX_MODEL="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_model', 'gpt-5.4'))" 2>/dev/null || echo "gpt-5.4")"
+CODEX_MODEL="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_model', 'gpt-5.5'))" 2>/dev/null || echo "gpt-5.5")"
 CODEX_REASONING="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_reasoning_effort', 'high'))" 2>/dev/null || echo "high")"
+CODEX_CONTEXT_WINDOW="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_context_window', 1000000))" 2>/dev/null || echo "1000000")"
+CODEX_AUTO_COMPACT="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_auto_compact_token_limit', 900000))" 2>/dev/null || echo "900000")"
 
 # Session ID file — written next to raw output for runner to capture
 SESSION_FILE="$OUTPUT_DIR/codex-session.txt"
@@ -74,10 +76,21 @@ for line in sys.stdin:
 run_codex() {
   # Clear stale temp file before each attempt
   rm -f "$REVIEW_TMP"
+  # </dev/null closes stdin so codex 0.129+ doesn't hang on "Reading additional
+  # input from stdin..." when invoked from a parent that holds stdin open (e.g.
+  # python subprocess.run inheriting an interactive terminal).
   if [ -n "$RESUME_SESSION" ]; then
-    codex exec resume "$RESUME_SESSION" -m "$CODEX_MODEL" -c model_reasoning_effort="$CODEX_REASONING" --json -o "$REVIEW_TMP" "$PROMPT" 2>&1
+    codex exec resume "$RESUME_SESSION" -m "$CODEX_MODEL" \
+      -c model_reasoning_effort="$CODEX_REASONING" \
+      -c model_context_window="$CODEX_CONTEXT_WINDOW" \
+      -c model_auto_compact_token_limit="$CODEX_AUTO_COMPACT" \
+      --json -o "$REVIEW_TMP" "$PROMPT" </dev/null 2>&1
   else
-    codex exec -m "$CODEX_MODEL" -c model_reasoning_effort="$CODEX_REASONING" --json -o "$REVIEW_TMP" "$PROMPT" 2>&1
+    codex exec -m "$CODEX_MODEL" \
+      -c model_reasoning_effort="$CODEX_REASONING" \
+      -c model_context_window="$CODEX_CONTEXT_WINDOW" \
+      -c model_auto_compact_token_limit="$CODEX_AUTO_COMPACT" \
+      --json -o "$REVIEW_TMP" "$PROMPT" </dev/null 2>&1
   fi
   # Verify -o produced non-empty output
   if [ ! -s "$REVIEW_TMP" ]; then

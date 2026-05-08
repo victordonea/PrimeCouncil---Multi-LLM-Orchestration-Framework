@@ -22,7 +22,7 @@ _DEFAULTS = {
     "runs_dir": "primecouncil/runs",
     "scripts_dir": "primecouncil/scripts",
     "templates_dir": "primecouncil/packets/templates",
-    "review_timeout": 300,
+    "review_timeout": 600,
 }
 
 
@@ -411,12 +411,12 @@ def cmd_review(args):
             if sid:
                 sessions["codex_session_id"] = sid
 
-    gemini_session_file = os.path.join(review_dir, "gemini-session.txt")
-    if run_gemini and os.path.exists(gemini_session_file):
-        with open(gemini_session_file, "r", encoding="utf-8") as f:
-            sid = f.read().strip()
-            if sid:
-                sessions["gemini_session_id"] = sid
+    # Gemini CLI's --list-sessions output is unreliable to parse, so we don't capture
+    # a UUID. Instead, mark the session as initiated; subsequent rounds pass "latest"
+    # to --resume. Only mark on success — failed runs leave the marker unchanged so a
+    # later retry doesn't try to resume a session that was never created.
+    if run_gemini and results["reviewers"].get("gemini", {}).get("status") in ("ok", "degraded"):
+        sessions["gemini_session_id"] = "latest"
 
     # Write updated sessions file
     with open(sessions_path, "w", encoding="utf-8") as f:

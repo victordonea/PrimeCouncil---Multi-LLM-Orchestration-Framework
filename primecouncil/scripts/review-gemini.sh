@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [ $# -lt 2 ]; then
-  echo "Usage: review-gemini.sh <prompt-file> <output-file> [session-id]"
+  echo "Usage: review-gemini.sh <prompt-file> <output-file> [resume-marker]"
   exit 1
 fi
 
@@ -27,9 +27,6 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/../config.json"
 GEMINI_MODEL="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('gemini_model', 'gemini-3-flash-preview'))" 2>/dev/null || echo "gemini-3-flash-preview")"
 
-# Session ID file — written next to raw output for runner to capture
-SESSION_FILE="$OUTPUT_DIR/gemini-session.txt"
-
 # Derive normalized review filename: gemini-output-raw.md -> gemini-review.md
 REVIEW_FILE="$(echo "$OUTPUT_FILE" | sed 's/-output-raw\.md/-review.md/')"
 
@@ -45,52 +42,40 @@ extract_review() {
   fi
 }
 
-# Capture the most recent Gemini session ID via --list-sessions
-# NOTE: assumes newest session is listed first. Verify ordering if issues arise.
-capture_gemini_session() {
-  local sid
-  sid="$(gemini --list-sessions 2>/dev/null | head -1 | awk '{print $1}')" || true
-  if [ -n "$sid" ]; then
-    echo "$sid" > "$SESSION_FILE"
-    echo "Session ID captured: $sid"
-  fi
+# Detect resume failure via stdout marker (Gemini exits 0 even on bad --resume)
+resume_failed() {
+  echo "$1" | grep -q "Invalid session identifier\|Error resuming session"
 }
 
-# Run Gemini with fallback chain for session resume
+# Run Gemini. If RESUME_SESSION is set, resume the latest session for this project.
+# Falls back to a fresh session if resume returns an error in stdout.
 run_gemini() {
+  # </dev/null on every CLI invocation: prevents future hangs if Gemini ever
+  # adopts stdin-appending behavior (Codex 0.129+ does this, hangs Python subprocess).
   if [ -n "$RESUME_SESSION" ]; then
-    # Try 1: resume stored session
-    if OUTPUT="$(gemini --resume "$RESUME_SESSION" -m "$GEMINI_MODEL" -p "$PROMPT" 2>&1)"; then
+    OUTPUT="$(gemini --resume latest -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1)" || true
+    if [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then
       echo "$OUTPUT"
       return 0
     fi
-    echo "Resume with stored session failed. Trying --resume latest..." >&2
-    # Try 2: resume latest
-    if OUTPUT="$(gemini --resume latest -m "$GEMINI_MODEL" -p "$PROMPT" 2>&1)"; then
-      echo "$OUTPUT"
-      return 0
-    fi
-    echo "Resume latest failed. Starting fresh session..." >&2
+    echo "Resume latest failed or returned error. Starting fresh session..." >&2
   fi
-  # Fresh session
-  gemini -m "$GEMINI_MODEL" -p "$PROMPT" 2>&1
+  gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1
 }
 
 # Attempt 1
-if OUTPUT="$(run_gemini)"; then
+if OUTPUT="$(run_gemini)" && [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
-  capture_gemini_session
   exit 0
 fi
 
-echo "Gemini attempt 1 failed. Retrying..."
+echo "Gemini attempt 1 failed. Retrying with fresh session..."
 
-# Attempt 2 (always fresh on retry — don't compound resume failures)
-if OUTPUT="$(gemini -m "$GEMINI_MODEL" -p "$PROMPT" 2>&1)"; then
+# Attempt 2 (always fresh on retry)
+if OUTPUT="$(gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1)" && [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
-  capture_gemini_session
   exit 0
 fi
 

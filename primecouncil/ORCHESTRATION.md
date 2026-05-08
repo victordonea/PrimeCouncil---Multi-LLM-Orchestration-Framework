@@ -93,7 +93,7 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 - Produce independent first-pass answer before consulting reviewers.
 - Keep first reviewer pass clean — do not include own answer in review packets.
 - Preserve detail during synthesis: agreements, disagreements, risks, strong ideas.
-- Present structured checkpoints via AskUserQuestion at required stages (see protocol-detail.md for checkpoint specs).
+- Present structured checkpoints as numbered options in chat at required stages (see protocol-detail.md for checkpoint specs).
 - Classify user input: soft preference / hard directive / no preference.
 - Drive toward material convergence. Recommend closure when looping adds no value.
 - Do not flatten nuance too early. Do not force agreement.
@@ -132,7 +132,7 @@ The post-execution flow is mandatory after ANY implementation, regardless of com
    - What got complicated — friction, workarounds, tradeoffs
    - What changed vs plan — deviations, simplifications, postponements
 
-2. **Present the post-execution checkpoint** via AskUserQuestion (see protocol-detail.md).
+2. **Present the post-execution checkpoint** as numbered options in chat (see protocol-detail.md).
 
 3. **If the user picks "Accept & close task"**, call `runner.py complete` to mark the task done. If the user chooses "Send implementation to reviewers" or "Rethink this", do not call `complete` — the task remains active until review is resolved or the reopened discussion concludes.
 
@@ -143,11 +143,11 @@ If implementation review surfaces material disagreement, recommend reopening orc
 ## Session hygiene
 All session actions require user approval. Claude recommends, never auto-executes. Session actions (/clear, /compact, restart) are user-triggered — Claude prepares save flow if needed, then prompts user to perform the action.
 
-**When to recommend saving** (present via AskUserQuestion: Save task summary / Save project progress / Save both / Skip):
+**When to recommend saving** (present as numbered options in chat: Save task summary / Save project progress / Save both / Skip):
 - After meaningful task completion
 - Before recommending /clear, restart, or fresh session (if useful context would be lost)
 
-**When to recommend a session action** (present via AskUserQuestion: Save & [action] / [Action] now / Stay):
+**When to recommend a session action** (present as numbered options in chat: Save & [action] / [Action] now / Stay):
 - Topic switch detected → recommend /clear
 - Context reaching ~60% → recommend compacting
 - After 2–3 DEEP loops → recommend /prime-save then restart
@@ -159,5 +159,5 @@ All session actions require user approval. Claude recommends, never auto-execute
 ## Output style
 - Keep transitions explicit, summaries tight, nuance preserved.
 - Distinguish clearly between: own view / team synthesis / user input / execution status.
-- Use AskUserQuestion for decision points and recommendations. Not for confirmations or conversational moments.
+- Present decision points and recommendations as numbered options in chat. Not for confirmations or conversational moments.
 - Do not drown user in noise.

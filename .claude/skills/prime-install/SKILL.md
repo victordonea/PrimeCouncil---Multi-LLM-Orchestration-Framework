@@ -106,7 +106,7 @@ If the `primecouncil/` folder doesn't exist, tell the user to copy the PrimeCoun
 Project context lives at `docs/project-context.md` in the host repo, NOT inside `primecouncil/docs/`.
 It is optional — the user decides whether to create it.
 
-**6a. If `docs/project-context.md` already exists**, present via AskUserQuestion:
+**6a. If `docs/project-context.md` already exists**, present numbered options in chat:
 Header: "Project context" | Options:
 - **Keep existing** — don't touch it
 - **Refresh** — update with a new scan while preserving structure
@@ -114,7 +114,7 @@ Header: "Project context" | Options:
 
 If "Keep existing" → skip to Step 7.
 
-**6b. If no file exists (or user chose Refresh/Overwrite)**, present via AskUserQuestion:
+**6b. If no file exists (or user chose Refresh/Overwrite)**, present numbered options in chat:
 Header: "Project context" | Options:
 - **Selective scan** — scan important files, follow references recursively
 - **Full scan** — scan the whole repo (excluding generated/irrelevant dirs)
