@@ -64,19 +64,19 @@ The root `CLAUDE.md` should **NOT:**
 
 The installer manages this. It contains:
 
-- Instruction to read `primecouncil/orch-state.json` before any orchestration decision
+- Instruction to read `.claude/primecouncil/orch-state.json` before any orchestration decision
 - `/prime-orch` is the canonical activation/state-control path; natural language commands (`ORCH ON`, `MODE STANDARD`, etc.) are aliases to the same state model
 - Write rules that update `orch-state.json`:
   - `ORCH ON`, `MODE MANUAL/STANDARD/DEEP` → update persistent state in orch-state.json
   - `ORCH OFF` → update state and exit orchestration-aware mode; no contract loading needed
   - `GO STANDARD/DEEP/DIRECT` → do **not** update persistent state; only trigger contract loading for the current task
-- Instruction to read `primecouncil/ORCHESTRATION.md` (via Read tool, NOT @import) when orchestration is active or being activated
+- Instruction to read `.claude/primecouncil/ORCHESTRATION.md` (via Read tool, NOT @import) when orchestration is active or being activated
 - Post-/compact recovery: re-read state, re-load contract if active
 - Visible confirmation on activation
-- Manual fallback: if orchestration appears inactive when it should be active, explicitly read `primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode
+- Manual fallback: if orchestration appears inactive when it should be active, explicitly read `.claude/primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode
 
 The managed block must **NOT:**
-- Use `@import` for `primecouncil/ORCHESTRATION.md` — @imports are expanded at launch, which would load ~180 lines every session and defeat on-demand loading
+- Use `@import` for `.claude/primecouncil/ORCHESTRATION.md` — @imports are expanded at launch, which would load ~180 lines every session and defeat on-demand loading
 - Auto-load the full contract every session
 - Auto-load `AGENTS.md` on activation
 
@@ -95,10 +95,10 @@ It should **not** be loaded merely because orchestration was turned on. This avo
 |---------|----------|-------------|
 | Project identity, stack, rules | Root `CLAUDE.md` | Every session (always) |
 | PrimeCouncil tripwire | Root `CLAUDE.md` (managed block) | Every session (always, but small) |
-| Full orchestration contract | `primecouncil/ORCHESTRATION.md` | On demand (when orch is active) |
-| Reviewer rules | `AGENTS.md` | On demand (during reviewer/packetized steps only) |
-| Gemini-specific rules | `GEMINI.md` | On demand (during Gemini reviewer invocation) |
-| Orchestration state | `primecouncil/orch-state.json` | Checked before orchestration decisions |
+| Full orchestration contract | `.claude/primecouncil/ORCHESTRATION.md` | On demand (when orch is active) |
+| Reviewer rules | `.claude/primecouncil/AGENTS.md` | On demand (during reviewer/packetized steps only) |
+| Gemini-specific rules | `.claude/primecouncil/GEMINI.md` | On demand (during Gemini reviewer invocation) |
+| Orchestration state | `.claude/primecouncil/orch-state.json` | Checked before orchestration decisions |
 | Detailed project context | `docs/project-context.md` (optional) | On demand, if present |
 | Domain-specific rules (e.g. n8n) | `docs/` or `.claude/rules/` | On demand or path-scoped |
 
@@ -110,7 +110,7 @@ That means:
 - It must never overwrite the whole root `CLAUDE.md`
 - It must insert or update only the managed PrimeCouncil block
 - It must preserve all existing project-specific content
-- It must create or update `primecouncil/ORCHESTRATION.md`
+- It must create or update `.claude/primecouncil/ORCHESTRATION.md`
 - It must avoid duplicate tripwire blocks on repeated installs
 - It must use `<!-- PRIMECOUNCIL:START -->` / `<!-- PRIMECOUNCIL:END -->` markers to locate its section
 
@@ -118,8 +118,8 @@ That means:
 
 1. Create the repo
 2. Write your project-first `CLAUDE.md` (just the project content — no PrimeCouncil block)
-3. Copy the `primecouncil/` folder into the repo
-4. Copy `AGENTS.md` and `GEMINI.md` to repo root
+3. Copy the `.claude/primecouncil/` folder into `.claude/primecouncil/`
+4. Copy `AGENTS.md` and `GEMINI.md` into `.claude/primecouncil/`
 5. Run `/prime-install`
 6. The installer adds the managed tripwire block to your existing `CLAUDE.md`
 7. Say `ORCH ON` to activate when needed

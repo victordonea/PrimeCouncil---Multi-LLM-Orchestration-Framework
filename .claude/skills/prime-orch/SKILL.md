@@ -7,11 +7,11 @@ argument-hint: [on|off|standard|deep|manual|status]
 
 # /prime-orch — Orchestration State Control
 
-Manage persistent orchestration state in `primecouncil/prime-orch-state.json`.
+Manage persistent orchestration state in `.claude/primecouncil/orch-state.json`.
 
 ## Read current state first
 
-Read `primecouncil/prime-orch-state.json`. If it doesn't exist, treat current state as `{"orch": "off", "default_mode": "manual"}`.
+Read `.claude/primecouncil/orch-state.json`. If it doesn't exist, treat current state as `{"orch": "off", "default_mode": "manual"}`.
 
 ## Handle the command: `$ARGUMENTS`
 
@@ -39,7 +39,7 @@ Show usage: `/prime-orch [on|off|standard|deep|manual|status]`
 
 ## Write the updated state
 
-Write the updated JSON to `primecouncil/prime-orch-state.json`:
+Write the updated JSON to `.claude/primecouncil/orch-state.json`:
 ```json
 {
   "orch": "...",

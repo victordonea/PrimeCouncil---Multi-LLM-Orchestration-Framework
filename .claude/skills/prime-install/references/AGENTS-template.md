@@ -1,7 +1,7 @@
 # AGENTS.md — PrimeCouncil Shared Reviewer Constitution
 
 This file is the shared source of truth for all PrimeCouncil reviewers.
-For full protocol stage details, see `primecouncil/docs/protocol-detail.md`.
+For full protocol stage details, see `.claude/primecouncil/docs/protocol-detail.md`.
 If present, see `docs/project-context.md` for project-specific context.
 
 ---
@@ -31,7 +31,7 @@ If present, see `docs/project-context.md` for project-specific context.
 - **STANDARD**: one independent round + one combined round + user checkpoints.
 - **DEEP**: multiple rounds until material convergence or user stops it.
 
-Full stage-by-stage protocols are in `primecouncil/docs/protocol-detail.md`.
+Full stage-by-stage protocols are in `.claude/primecouncil/docs/protocol-detail.md`.
 
 ---
 

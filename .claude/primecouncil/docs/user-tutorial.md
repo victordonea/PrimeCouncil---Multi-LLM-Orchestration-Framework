@@ -29,7 +29,7 @@ Don't worry if you're not sure — PrimeCouncil will tell you if something's mis
 **Step 1: Copy the PrimeCouncil kit into your project**
 
 Copy these into your project's root folder:
-- The `primecouncil/` folder (the whole thing)
+- The `.claude/primecouncil/` folder (the whole thing)
 - `AGENTS.md`
 - `GEMINI.md`
 - The `.claude/skills/` folder (contains the PrimeCouncil skills)
@@ -257,19 +257,19 @@ When Claude asks for your input at checkpoints:
 | File | Purpose | Loaded when |
 |---|---|---|
 | `CLAUDE.md` | Project identity + PrimeCouncil tripwire (managed block) | Always loaded as project context |
-| `primecouncil/ORCHESTRATION.md` | Full orchestration contract | On demand (when orch is active) |
+| `.claude/primecouncil/ORCHESTRATION.md` | Full orchestration contract | On demand (when orch is active) |
 | `AGENTS.md` | Shared reviewer constitution | When orchestration step runs |
 | `GEMINI.md` | Gemini-specific instructions | When Gemini CLI is invoked |
 | `docs/project-context.md` | Deep project details (host repo, optional) | On demand if present |
-| `primecouncil/docs/project-progress.md` | Project story across sessions | By `/prime-resume` and `/prime-save` |
-| `primecouncil/docs/packet-spec.md` | Packet structure + brevity rules | When building packets |
-| `primecouncil/docs/protocol-detail.md` | Full STANDARD/DEEP stage walkthrough | When orchestration step runs |
-| `primecouncil/docs/runs-spec.md` | Run folder conventions | Reference only |
-| `primecouncil/orch-state.json` | Persistent ORCH on/off + default mode | Before orchestration decisions (gitignored, per-user) |
+| `.claude/primecouncil/docs/project-progress.md` | Project story across sessions | By `/prime-resume` and `/prime-save` |
+| `.claude/primecouncil/docs/packet-spec.md` | Packet structure + brevity rules | When building packets |
+| `.claude/primecouncil/docs/protocol-detail.md` | Full STANDARD/DEEP stage walkthrough | When orchestration step runs |
+| `.claude/primecouncil/docs/runs-spec.md` | Run folder conventions | Reference only |
+| `.claude/primecouncil/orch-state.json` | Persistent ORCH on/off + default mode | Before orchestration decisions (gitignored, per-user) |
 
 ---
 
-## Per-task files (in `primecouncil/runs/TASK_ID/`)
+## Per-task files (in `.claude/primecouncil/runs/TASK_ID/`)
 
 | File | What it is |
 |---|---|

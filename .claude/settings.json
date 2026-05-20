@@ -1,7 +1,7 @@
 {
   "statusLine": {
     "type": "command",
-    "command": "bash primecouncil/scripts/statusline.sh"
+    "command": "bash .claude/primecouncil/scripts/statusline.sh"
   },
   "permissions": {
     "allow": [

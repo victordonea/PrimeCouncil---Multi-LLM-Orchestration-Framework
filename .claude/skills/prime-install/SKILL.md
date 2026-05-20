@@ -1,13 +1,13 @@
 ---
 name: prime-install
-description: Install or update the PrimeCouncil multi-LLM orchestration framework in the current repository. Use this skill when the user says "install primecouncil", "set up orchestration", "add primecouncil to this repo", or when the primecouncil/ folder exists but CLAUDE.md is missing the PrimeCouncil managed block.
+description: Install or update the PrimeCouncil multi-LLM orchestration framework in the current repository. Use this skill when the user says "install primecouncil", "set up orchestration", "add primecouncil to this repo", or when the .claude/primecouncil/ folder exists but CLAUDE.md is missing the PrimeCouncil managed block.
 ---
 
 # PrimeCouncil Install
 
 Set up the PrimeCouncil orchestration kit in the current repository.
 PrimeCouncil is a **guest** — it adds a small managed block to your CLAUDE.md, not a full contract.
-See `primecouncil/docs/host-repo-pattern.md` for the full integration pattern.
+See `.claude/primecouncil/docs/host-repo-pattern.md` for the full integration pattern.
 
 ## Step 1 — Check for existing CLAUDE.md
 
@@ -31,7 +31,7 @@ The generic PrimeCouncil tripwire block to insert/update (from the host-repo pat
 <!-- PRIMECOUNCIL:START - Do not edit this section manually -->
 ## PrimeCouncil
 
-Before orchestration decisions, read `primecouncil/orch-state.json`.
+Before orchestration decisions, read `.claude/primecouncil/orch-state.json`.
 If missing, default to `{"orch": "off", "default_mode": "manual"}`.
 `/prime-orch` is the canonical activation path; natural language commands are aliases.
 
@@ -39,25 +39,25 @@ If missing, default to `{"orch": "off", "default_mode": "manual"}`.
 `GO STANDARD/DEEP/DIRECT` → task-scoped only, do NOT update `orch-state.json`.
 
 If `orch` is `"on"`, or the user turns orchestration on, or issues a `GO` command:
-read `primecouncil/ORCHESTRATION.md` using the Read tool and enter orchestration-aware mode.
+read `.claude/primecouncil/ORCHESTRATION.md` using the Read tool and enter orchestration-aware mode.
 `ORCH OFF` updates state and exits orchestration-aware mode — no contract loading needed.
 Do NOT use @import — read on demand.
 
 After `/compact` or session reset: re-read `orch-state.json`.
-If `orch` is `"on"`, re-read `primecouncil/ORCHESTRATION.md`.
+If `orch` is `"on"`, re-read `.claude/primecouncil/ORCHESTRATION.md`.
 
 Do not load `AGENTS.md` on activation. Load only when entering reviewer/packetized steps.
 
 Confirm activation visibly when orchestration becomes active.
 
 If orchestration seems inactive when it should be active:
-read `primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode.
+read `.claude/primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode.
 <!-- PRIMECOUNCIL:END -->
 ```
 
 ## Step 3 — Create default orch-state.json
 
-If `primecouncil/orch-state.json` does not exist, create it:
+If `.claude/primecouncil/orch-state.json` does not exist, create it:
 ```json
 {
   "orch": "off",
@@ -70,11 +70,13 @@ If `primecouncil/orch-state.json` does not exist, create it:
 Ensure these exist, create any missing:
 
 ```
-primecouncil/
+.claude/primecouncil/
   ORCHESTRATION.md
   runner.py
   config.json
   orch-state.json
+  AGENTS.md
+  GEMINI.md
   scripts/
     review-codex.sh
     review-gemini.sh
@@ -95,15 +97,11 @@ primecouncil/
   runs/
 ```
 
-Also ensure at repo root:
-- `AGENTS.md` — shared reviewer constitution
-- `GEMINI.md` — thin Gemini wrapper
-
-If the `primecouncil/` folder doesn't exist, tell the user to copy the PrimeCouncil kit into the repo first.
+If the `.claude/primecouncil/` folder doesn't exist, tell the user to copy the PrimeCouncil kit into the repo first.
 
 ## Step 6 — Project context (optional)
 
-Project context lives at `docs/project-context.md` in the host repo, NOT inside `primecouncil/docs/`.
+Project context lives at `docs/project-context.md` in the host repo, NOT inside `.claude/primecouncil/docs/`.
 It is optional — the user decides whether to create it.
 
 **6a. If `docs/project-context.md` already exists**, present numbered options in chat:
@@ -128,7 +126,7 @@ If "Skip" → continue to Step 7.
 - Do not blindly read the entire repo
 
 **6d. Full scan behavior:**
-- Scan the repo broadly, but **exclude**: `.git/`, `node_modules/`, `dist/`, `build/`, `__pycache__/`, `.next/`, `primecouncil/runs/`, lock files, binaries, media, generated/cache folders
+- Scan the repo broadly, but **exclude**: `.git/`, `node_modules/`, `dist/`, `build/`, `__pycache__/`, `.next/`, `.claude/primecouncil/runs/`, lock files, binaries, media, generated/cache folders
 - Focus on source files, docs, and config
 
 **6e. Generate** `docs/project-context.md` using the template from `references/project-context-template.md`. The generated file should be comprehensive and high-value — not a lightweight placeholder.
@@ -167,7 +165,7 @@ KEY COMMANDS:
 - /prime-resume — pick up where you left off
 - ORCH ON, GO STANDARD, GO DEEP — natural language also works
 
-📖 Full guide: primecouncil/docs/user-tutorial.md
+📖 Full guide: .claude/primecouncil/docs/user-tutorial.md
 ```
 
 ## Rules
@@ -177,4 +175,4 @@ KEY COMMANDS:
 - **Preserve all existing project content** outside the markers.
 - **Always ask before creating a new CLAUDE.md** if none exists.
 - **Keep it simple.** Ask the user for project details, don't auto-scan the repo.
-- **Maintenance rule:** Whenever `primecouncil/ORCHESTRATION.md` changes, sync `references/orchestration-template.md`.
+- **Maintenance rule:** Whenever `.claude/primecouncil/ORCHESTRATION.md` changes, sync `references/orchestration-template.md`.

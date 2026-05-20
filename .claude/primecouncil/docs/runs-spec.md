@@ -1,6 +1,6 @@
 # Runs — Folder Structure and Conventions
 
-All orchestrated task runs are stored under `primecouncil/runs/`.
+All orchestrated task runs are stored under `.claude/primecouncil/runs/`.
 
 ---
 
@@ -17,7 +17,7 @@ Example: `2026-03-31-task-001-packet-system`
 ## Folder structure
 
 ```
-primecouncil/runs/
+.claude/primecouncil/runs/
   2026-03-31-task-001-packet-system/
     task.md                              # task metadata
     task-summary.md                      # session restart save point (when needed)
@@ -82,7 +82,7 @@ Minimal metadata file per task:
 **Optional:**
 - Implementation review folder (only when review is run)
 - task.md (recommended but not blocking)
-- task-summary.md (saved before session restart, used to resume in new session. Template: `primecouncil/packets/templates/task-summary.md`)
+- task-summary.md (saved before session restart, used to resume in new session. Template: `.claude/primecouncil/packets/templates/task-summary.md`)
 - current-state.md (DEEP mode only: overwritten each round, single source of truth for where DEEP stands)
 
 ---

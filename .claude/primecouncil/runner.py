@@ -14,14 +14,14 @@ import sys
 
 # Resolve config path relative to this file, not cwd
 _RUNNER_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.dirname(_RUNNER_DIR)
+_PRIME_PARENT_DIR = os.path.dirname(_RUNNER_DIR)
 _CONFIG_PATH = os.path.join(_RUNNER_DIR, "config.json")
 
 _DEFAULTS = {
     "codex_model": "gpt-5.4",
-    "runs_dir": "primecouncil/runs",
-    "scripts_dir": "primecouncil/scripts",
-    "templates_dir": "primecouncil/packets/templates",
+    "runs_dir": ".claude/primecouncil/runs",
+    "scripts_dir": ".claude/primecouncil/scripts",
+    "templates_dir": ".claude/primecouncil/packets/templates",
     "review_timeout": 600,
 }
 
@@ -43,10 +43,10 @@ def load_config():
 
 CONFIG = load_config()
 
-# Base paths (config values resolved to absolute via repo root)
-RUNS_DIR = os.path.join(_REPO_ROOT, CONFIG["runs_dir"])
-SCRIPTS_DIR = os.path.join(_REPO_ROOT, CONFIG["scripts_dir"])
-TEMPLATES_DIR = os.path.join(_REPO_ROOT, CONFIG["templates_dir"])
+# Base paths (config values resolved to absolute via parent dir)
+RUNS_DIR = os.path.join(_PRIME_PARENT_DIR, CONFIG["runs_dir"])
+SCRIPTS_DIR = os.path.join(_PRIME_PARENT_DIR, CONFIG["scripts_dir"])
+TEMPLATES_DIR = os.path.join(_PRIME_PARENT_DIR, CONFIG["templates_dir"])
 
 
 def _classify_round(present, is_impl=False):
@@ -521,9 +521,9 @@ def cmd_status(args):
         elif has_gemini_pkt and not has_codex_pkt:
             reviewer_flag = " --gemini-only"
         if kind == "round":
-            result["recovery_hint"] = f"Re-run: python primecouncil/runner.py review --task-id {args.task_id} --round {num}{reviewer_flag} --content \"...\""
+            result["recovery_hint"] = f"Re-run: python .claude/primecouncil/runner.py review --task-id {args.task_id} --round {num}{reviewer_flag} --content \"...\""
         else:
-            result["recovery_hint"] = f"Re-run: python primecouncil/runner.py review --task-id {args.task_id} --impl{reviewer_flag} --content \"...\""
+            result["recovery_hint"] = f"Re-run: python .claude/primecouncil/runner.py review --task-id {args.task_id} --impl{reviewer_flag} --content \"...\""
 
     print(json.dumps(result, indent=2))
 

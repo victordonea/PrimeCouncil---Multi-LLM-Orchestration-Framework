@@ -12,10 +12,10 @@ Reconstruct working context from saved artifacts after a session restart or /cle
 Run both of these:
 
 **Project progress:**
-Read `primecouncil/docs/project-progress.md` if it exists.
+Read `.claude/primecouncil/docs/project-progress.md` if it exists.
 
 **Active tasks:**
-Run `python primecouncil/runner.py list`
+Run `python .claude/primecouncil/runner.py list`
 
 From the list output, identify:
 - Tasks with status "active" or "paused"
@@ -25,7 +25,7 @@ From the list output, identify:
 ## Step 2 — Load relevant summaries
 
 For each active task that has a summary:
-Read `primecouncil/runs/TASK_ID/task-summary.md`
+Read `.claude/primecouncil/runs/TASK_ID/task-summary.md`
 
 If there are multiple active tasks, prioritize the most recently modified one.
 Do not load more than 2 task summaries — if there are more, list them and ask the user which to focus on.

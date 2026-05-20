@@ -19,11 +19,10 @@ Each reviewer works independently before seeing the others' answers. This preven
 
 ## Quick start
 
-1. Copy the `primecouncil/` folder and `.claude/skills/` into your project repo
-2. Copy `AGENTS.md` and `GEMINI.md` to your repo root
-3. Open Claude Code in the repo
-4. Run `/prime-install` — it sets up CLAUDE.md and fills in your project context
-5. Say `ORCH ON` and start working
+1. Copy the `.claude/primecouncil/` folder (which now contains AGENTS.md + GEMINI.md inside it) and the `.claude/skills/` folder into your project repo
+2. Open Claude Code in the repo
+3. Run `/prime-install` — it sets up CLAUDE.md and fills in your project context
+4. Say `ORCH ON` and start working
 
 ## Commands
 
@@ -43,17 +42,20 @@ Each reviewer works independently before seeing the others' answers. This preven
 ```
 your-project/
   CLAUDE.md                    # Project identity + PrimeCouncil managed tripwire block
-  AGENTS.md                    # Shared reviewer constitution
-  GEMINI.md                    # Gemini-specific reviewer instructions
-  .claude/skills/              # PrimeCouncil skills (prime-orch, prime-save, prime-resume, prime-install)
-  primecouncil/
-    ORCHESTRATION.md           # Full orchestration contract (loaded on demand)
-    runner.py                  # Mechanical automation (folders, packets, reviewers)
-    config.json                # Centralized paths, models, timeouts
-    scripts/                   # Reviewer CLI adapters + statusline
-    packets/templates/         # Packet templates for each review type
-    docs/                      # Protocol details, project context, specs, host-repo pattern
-    runs/                      # Task history — one folder per task
+  .claude/
+    skills/                    # PrimeCouncil skills (prime-orch, prime-save, prime-resume, prime-install)
+    settings.json              # Status line + permissions
+    primecouncil/
+      AGENTS.md                # Shared reviewer constitution
+      GEMINI.md                # Gemini-specific reviewer instructions
+      ORCHESTRATION.md         # Full orchestration contract (loaded on demand)
+      runner.py                # Mechanical automation (folders, packets, reviewers)
+      config.json              # Centralized paths, models, timeouts
+      orch-state.json          # Persistent ORCH on/off + default mode (per-machine, gitignored)
+      scripts/                 # Reviewer CLI adapters + statusline
+      packets/templates/       # Packet templates for each review type
+      docs/                    # Protocol details, specs, host-repo pattern, user tutorial
+      runs/                    # Task history — one folder per task
 ```
 
 ## Key design principles
@@ -70,7 +72,7 @@ If you want to understand the full system:
 
 1. This README (you're here)
 2. `CLAUDE.md` — the operating contract
-3. `AGENTS.md` — shared reviewer rules
-4. `primecouncil/docs/packet-spec.md` — how review packets work
-5. `primecouncil/docs/protocol-detail.md` — full STANDARD/DEEP stage walkthrough
-6. `primecouncil/docs/runs-spec.md` — run folder conventions
+3. `.claude/primecouncil/AGENTS.md` — shared reviewer rules
+4. `.claude/primecouncil/docs/packet-spec.md` — how review packets work
+5. `.claude/primecouncil/docs/protocol-detail.md` — full STANDARD/DEEP stage walkthrough
+6. `.claude/primecouncil/docs/runs-spec.md` — run folder conventions

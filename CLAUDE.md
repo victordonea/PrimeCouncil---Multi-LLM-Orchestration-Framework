@@ -13,9 +13,9 @@ Framework complete. Post-first-run hardening done. Ready for production use.
 - Claude Code (orchestrator environment)
 
 ## Key directories
-- `primecouncil/` — runner, scripts, config, templates, docs, run history
+- `.claude/primecouncil/` — runner, scripts, config, templates, docs, run history, AGENTS.md, GEMINI.md
 - `.claude/skills/` — prime-orch, prime-save, prime-resume, prime-install
-- `primecouncil/docs/` — protocol detail, packet spec, runs spec, project context
+- `.claude/primecouncil/docs/` — protocol detail, packet spec, runs spec, host-repo pattern, user tutorial
 
 ## Key conventions
 - Runner handles all mechanical file operations — never create task folders manually
@@ -27,25 +27,25 @@ For project orientation, see `docs/project-context.md` if present — but do not
 <!-- PRIMECOUNCIL:START - Do not edit this section manually -->
 ## PrimeCouncil
 
-Before orchestration decisions, read `primecouncil/orch-state.json`.
+Before orchestration decisions, read `.claude/primecouncil/orch-state.json`.
 If missing, default to `{"orch": "off", "default_mode": "manual"}`.
 `/prime-orch` is the canonical activation path; natural language commands are aliases.
 
-`ORCH ON/OFF`, `MODE MANUAL/STANDARD/DEEP` → update `orch-state.json`.
-`GO STANDARD/DEEP/DIRECT` → task-scoped only, do NOT update `orch-state.json`.
+`ORCH ON/OFF`, `MODE MANUAL/STANDARD/DEEP` → update `.claude/primecouncil/orch-state.json`.
+`GO STANDARD/DEEP/DIRECT` → task-scoped only, do NOT update `.claude/primecouncil/orch-state.json`.
 
 If `orch` is `"on"`, or the user turns orchestration on, or issues a `GO` command:
-read `primecouncil/ORCHESTRATION.md` using the Read tool and enter orchestration-aware mode.
+read `.claude/primecouncil/ORCHESTRATION.md` using the Read tool and enter orchestration-aware mode.
 `ORCH OFF` updates state and exits orchestration-aware mode — no contract loading needed.
 Do NOT use @import — read on demand.
 
-After `/compact` or session reset: re-read `orch-state.json`.
-If `orch` is `"on"`, re-read `primecouncil/ORCHESTRATION.md`.
+After `/compact` or session reset: re-read `.claude/primecouncil/orch-state.json`.
+If `orch` is `"on"`, re-read `.claude/primecouncil/ORCHESTRATION.md`.
 
 Do not load `AGENTS.md` on activation. Load only when entering reviewer/packetized steps.
 
 Confirm activation visibly when orchestration becomes active.
 
 If orchestration seems inactive when it should be active:
-read `primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode.
+read `.claude/primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode.
 <!-- PRIMECOUNCIL:END -->

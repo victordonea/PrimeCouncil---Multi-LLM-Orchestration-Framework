@@ -1,7 +1,7 @@
 # Packet Specification
 
 Packets are the structured context artifacts Claude produces for each orchestration step.
-Template files live in `primecouncil/packets/templates/`.
+Template files live in `.claude/primecouncil/packets/templates/`.
 
 ---
 

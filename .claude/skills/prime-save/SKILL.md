@@ -12,7 +12,7 @@ Save task-level and/or project-level context so nothing useful is lost on sessio
 Determine the current situation:
 
 **Is there an active unfinished task?**
-- Check: `python primecouncil/runner.py list`
+- Check: `python .claude/primecouncil/runner.py list`
 - If an active task exists with unsaved or outdated context → task-summary needed
 
 **Was there meaningful project-level progress?**
@@ -32,11 +32,11 @@ Do not present the chooser if the user already specified what to save.
 
 ## Step 2 — Save task summary (if needed)
 
-Use the template structure from `primecouncil/packets/templates/task-summary.md`.
+Use the template structure from `.claude/primecouncil/packets/templates/task-summary.md`.
 
 Write it with:
 ```
-python primecouncil/runner.py save --task-id TASK_ID --filename task-summary.md --content "..."
+python .claude/primecouncil/runner.py save --task-id TASK_ID --filename task-summary.md --content "..."
 ```
 
 **Content rules:**
@@ -52,7 +52,7 @@ python primecouncil/runner.py save --task-id TASK_ID --filename task-summary.md 
 
 ## Step 3 — Update project progress (if needed)
 
-Read the current `primecouncil/docs/project-progress.md`.
+Read the current `.claude/primecouncil/docs/project-progress.md`.
 
 **Smart patching — only add what's new:**
 1. Read current file content

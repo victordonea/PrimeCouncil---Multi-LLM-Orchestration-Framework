@@ -9,8 +9,8 @@
 Do NOT auto-import AGENTS.md every turn.
 - Load `AGENTS.md` + relevant packet template only when actually executing a packetized step: building a packet, invoking reviewers, or performing synthesis. Not when merely discussing or recommending modes.
 - In DIRECT mode or normal conversation: do not load shared docs.
-- Before any orchestration decision (recommending a mode, activating a task, approving escalation, resuming after /compact), read `primecouncil/orch-state.json` for current state. If absent, default to orch: off, default_mode: manual.
-- On-demand references: `primecouncil/docs/protocol-detail.md` (full stage walkthrough), `docs/project-context.md` (deep project details, if present), `primecouncil/docs/packet-spec.md` (packet structure + brevity rules), `primecouncil/docs/runs-spec.md` (run folder conventions).
+- Before any orchestration decision (recommending a mode, activating a task, approving escalation, resuming after /compact), read `.claude/primecouncil/orch-state.json` for current state. If absent, default to orch: off, default_mode: manual.
+- On-demand references: `.claude/primecouncil/docs/protocol-detail.md` (full stage walkthrough), `docs/project-context.md` (deep project details, if present), `.claude/primecouncil/docs/packet-spec.md` (packet structure + brevity rules), `.claude/primecouncil/docs/runs-spec.md` (run folder conventions).
 
 ---
 
@@ -23,7 +23,7 @@ Commands: `ORCH ON/OFF`, `MODE MANUAL/STANDARD/DEEP`, `GO STANDARD/DEEP/DIRECT`.
 
 ORCH OFF = behave normally. ORCH ON = orchestration-aware, recommend modes on substantial tasks. MODE MANUAL = recommend and wait. MODE STANDARD/DEEP = default to that mode unless overridden.
 
-When the user says ORCH ON, ORCH OFF, MODE MANUAL, MODE STANDARD, or MODE DEEP, update `primecouncil/orch-state.json` to match. GO STANDARD / GO DEEP / GO DIRECT are task-scoped only and do not update persistent defaults.
+When the user says ORCH ON, ORCH OFF, MODE MANUAL, MODE STANDARD, or MODE DEEP, update `.claude/primecouncil/orch-state.json` to match. GO STANDARD / GO DEEP / GO DIRECT are task-scoped only and do not update persistent defaults.
 
 ---
 
@@ -64,12 +64,12 @@ Keep recommendations short: task label → recommended mode → short reason →
 All file/folder operations during orchestration go through the runner. Do NOT manually create task folders, packet files, or round directories.
 
 **Commands:**
-- `python primecouncil/runner.py init --label "task name" --mode standard --objective "brief"` → creates task folder + round-01 + task.md. Returns JSON with task_id and paths.
-- `python primecouncil/runner.py save --task-id TASK_ID --round N --filename NAME.md --content "..."` → saves any file to the right location.
-- `python primecouncil/runner.py review --task-id TASK_ID --round N --content "packet body"` → writes both reviewer packets, runs both scripts, returns JSON with paths to clean reviews. For implementation review use `--impl` instead of `--round N`.
-- `python primecouncil/runner.py new-round --task-id TASK_ID` → creates next round folder.
-- `python primecouncil/runner.py status --task-id TASK_ID` → shows files in each round.
-- `python primecouncil/runner.py complete --task-id TASK_ID` → marks task as complete, updates rounds count.
+- `python .claude/primecouncil/runner.py init --label "task name" --mode standard --objective "brief"` → creates task folder + round-01 + task.md. Returns JSON with task_id and paths.
+- `python .claude/primecouncil/runner.py save --task-id TASK_ID --round N --filename NAME.md --content "..."` → saves any file to the right location.
+- `python .claude/primecouncil/runner.py review --task-id TASK_ID --round N --content "packet body"` → writes both reviewer packets, runs both scripts, returns JSON with paths to clean reviews. For implementation review use `--impl` instead of `--round N`.
+- `python .claude/primecouncil/runner.py new-round --task-id TASK_ID` → creates next round folder.
+- `python .claude/primecouncil/runner.py status --task-id TASK_ID` → shows files in each round.
+- `python .claude/primecouncil/runner.py complete --task-id TASK_ID` → marks task as complete, updates rounds count.
 
 **When to call the runner:**
 - On new task activation (STANDARD/DEEP): call `init`
@@ -102,8 +102,9 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 ---
 
 ## Orchestration duties (when STANDARD or DEEP)
-- Produce independent first-pass answer before consulting reviewers.
-- Keep first reviewer pass clean — do not include own answer in review packets.
+- **Independent first-pass.** Write the first-pass *without seeing reviewer output*. Independence means "not influenced by reviewers" — NOT a temporal "before reviewers fire" rule. The first-pass happens in parallel during the reviewer wait (see Parallel execution rule above), fired AFTER `runner.py review` is launched in background.
+- **First-pass scope — match it to the task's prior context.** When the task was already substantively explored in chat: keep the first-pass **tight (~10-30 lines)** — committed position in 2-3 sentences, top 3 risks (one line each), confidence + one-sentence rationale. That's enough to preserve commitment + independence + future-readability. When the task arrives **cold (no prior chat exploration)**: write a fuller first-pass (50-100 lines) capturing real analysis. Either way, substantive investigation — file inventories, deep risk analysis, test design — belongs in `claude-deeper-analysis.md` (saved during reviewer wait), NOT in the first-pass. The first-pass is a discipline checkpoint, not a research document.
+- **Keep first reviewer packets clean.** Do not include your own answer in review packets (per AGENTS.md first-pass-independence rule). The packet contains task framing + context; the first-pass is a separate artifact reviewers never see.
 - Preserve detail during synthesis: agreements, disagreements, risks, strong ideas.
 - Present structured checkpoints as numbered options in chat at required stages (see protocol-detail.md for checkpoint specs).
 - Classify user input: soft preference / hard directive / no preference.
@@ -112,7 +113,7 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 
 ## DEEP mode context compression
 In DEEP mode round 2+, do NOT re-read all previous synthesis files. Instead:
-- After each synthesis, save a `current-state.md` to the task root: `python primecouncil/runner.py save --task-id TASK_ID --filename current-state.md --content "..."`
+- After each synthesis, save a `current-state.md` to the task root: `python .claude/primecouncil/runner.py save --task-id TASK_ID --filename current-state.md --content "..."`
 - `current-state.md` is overwritten each round — it always reflects the latest state.
 - In subsequent rounds, read ONLY `current-state.md` + the latest reviewer outputs. Never go back to earlier round files.
 - Contents: agreed direction, disputed points, remaining risks, current constraints, user preferences so far, next decision needed.
