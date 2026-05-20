@@ -76,21 +76,21 @@ for line in sys.stdin:
 run_codex() {
   # Clear stale temp file before each attempt
   rm -f "$REVIEW_TMP"
-  # </dev/null closes stdin so codex 0.129+ doesn't hang on "Reading additional
-  # input from stdin..." when invoked from a parent that holds stdin open (e.g.
-  # python subprocess.run inheriting an interactive terminal).
+  # Prompt is piped via stdin (codex reads from stdin when the prompt arg is `-`).
+  # This avoids the Windows CreateProcess ~32KB CLI-arg limit that silently
+  # truncated large packets. After the file is consumed, codex sees EOF and proceeds.
   if [ -n "$RESUME_SESSION" ]; then
     codex exec resume "$RESUME_SESSION" -m "$CODEX_MODEL" \
       -c model_reasoning_effort="$CODEX_REASONING" \
       -c model_context_window="$CODEX_CONTEXT_WINDOW" \
       -c model_auto_compact_token_limit="$CODEX_AUTO_COMPACT" \
-      --json -o "$REVIEW_TMP" "$PROMPT" </dev/null 2>&1
+      --json -o "$REVIEW_TMP" - <"$PROMPT_FILE" 2>&1
   else
     codex exec -m "$CODEX_MODEL" \
       -c model_reasoning_effort="$CODEX_REASONING" \
       -c model_context_window="$CODEX_CONTEXT_WINDOW" \
       -c model_auto_compact_token_limit="$CODEX_AUTO_COMPACT" \
-      --json -o "$REVIEW_TMP" "$PROMPT" </dev/null 2>&1
+      --json -o "$REVIEW_TMP" - <"$PROMPT_FILE" 2>&1
   fi
   # Verify -o produced non-empty output
   if [ ! -s "$REVIEW_TMP" ]; then

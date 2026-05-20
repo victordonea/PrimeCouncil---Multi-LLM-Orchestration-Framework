@@ -47,7 +47,7 @@ If you need more context, explore beyond the specified ranges before deciding.
 - If context still feels insufficient, say exactly what file or section is missing.
 
 ## Required output format
-Use the reviewer format from AGENTS.md: Verdict, Strongest points, Risks/weaknesses, Recommended changes, Open questions, Confidence.
+[Specify the shape that best fits this task. End with confidence.]
 
 **Required:** You MUST begin your review output with this exact marker line on its own line: ===REVIEW START===
 Do not include any preamble, reasoning, or file reads before this marker. The marker must be the first thing in your output.

@@ -49,15 +49,7 @@ After the first independent round:
 ---
 
 ## Reviewer response format
-When acting as a reviewer, use this structure:
-1. **Verdict** — high-level view in 1–3 sentences.
-2. **Strongest points** — best ideas, strongest reasoning, best direction.
-3. **Risks / weaknesses** — flaws, hidden assumptions, edge cases, tradeoffs.
-4. **Recommended changes** — what should change, tighten, simplify, or be prioritized.
-5. **Open questions** — only questions that materially affect the decision.
-6. **Confidence** — low / medium / high.
-
-Keep outputs practical and decision-oriented. Do not pad with filler.
+Follow the format specified in the packet. End with a confidence assessment (low/medium/high). Keep outputs practical and decision-oriented. Do not pad with filler.
 
 ---
 

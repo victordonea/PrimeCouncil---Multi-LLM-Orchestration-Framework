@@ -51,7 +51,7 @@ Used when Claude sends clean task context to Codex and Gemini for independent re
 - Relevant files
 - Success criteria
 - Reviewer questions
-- Required output format (reference AGENTS.md reviewer format)
+- Required output format (the shape that best fits this task)
 
 **Rule:** Must NOT contain Claude's own first-pass answer.
 

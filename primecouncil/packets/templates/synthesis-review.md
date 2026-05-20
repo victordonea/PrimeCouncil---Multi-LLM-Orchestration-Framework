@@ -47,7 +47,7 @@
 - If no file references are included, confirm the packet itself was sufficient for your assessment.
 
 ## Required output format
-Use the reviewer format from AGENTS.md: Verdict, Strongest points, Risks/weaknesses, Recommended changes, Open questions, Confidence.
+[Specify the shape that best fits this task. End with confidence.]
 
 **Round 2+ requirement:** State what you CHANGED your mind on since last round and why. If you now agree with the synthesis, say whether it is because of new reasoning/evidence or because the synthesis was persuasive. Flag honestly if you are deferring rather than genuinely convinced.
 

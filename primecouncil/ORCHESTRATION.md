@@ -89,6 +89,18 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 
 ---
 
+## Parallel execution — always background `review`
+
+`runner.py review` takes minutes (Codex / Gemini sub-agents run). **Fire `review` FIRST, with `run_in_background: true`, then immediately start the next parallel task.** Never block Claude's window on a `review` call — the rule is binary, no "this one will be quick" exceptions.
+
+**The two common patterns:**
+- **Both run independent passes:** fire `review` in background → Claude does his own independent pass during the wait → reconcile when reviewers return.
+- **Reviewers run, Claude has other work:** fire `review` in background → Claude continues that other work → handle reviewer output when notified.
+
+**Only block on `review`** when there is literally no parallel work available. **Don't poll** — the harness notifies on completion.
+
+---
+
 ## Orchestration duties (when STANDARD or DEEP)
 - Produce independent first-pass answer before consulting reviewers.
 - Keep first reviewer pass clean — do not include own answer in review packets.
