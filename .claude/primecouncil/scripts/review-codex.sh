@@ -22,13 +22,24 @@ mkdir -p "$OUTPUT_DIR"
 PROMPT="$(cat "$PROMPT_FILE")"
 TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-# Read config from config.json (resolved relative to this script)
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CONFIG_FILE="$SCRIPT_DIR/../config.json"
-CODEX_MODEL="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_model', 'gpt-5.5'))" 2>/dev/null || echo "gpt-5.5")"
-CODEX_REASONING="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_reasoning_effort', 'high'))" 2>/dev/null || echo "high")"
-CODEX_CONTEXT_WINDOW="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_context_window', 1000000))" 2>/dev/null || echo "1000000")"
-CODEX_AUTO_COMPACT="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('codex_auto_compact_token_limit', 900000))" 2>/dev/null || echo "900000")"
+# Read config from config.json. Resolve the path inside Python so Windows + Git Bash
+# (/c/... vs C:\...) doesn't trip json.load. All four values come back tab-separated.
+CONFIG_VALS="$(python -c "
+import json, os, sys
+sd = os.path.dirname(os.path.abspath(sys.argv[1]))
+cf = os.path.join(sd, '..', 'config.json')
+try:
+    d = json.load(open(cf))
+    print('\t'.join([
+        str(d.get('codex_model', 'gpt-5.5')),
+        str(d.get('codex_reasoning_effort', 'high')),
+        str(d.get('codex_context_window', 1000000)),
+        str(d.get('codex_auto_compact_token_limit', 900000)),
+    ]))
+except:
+    print('gpt-5.5\thigh\t1000000\t900000')
+" "$0" 2>/dev/null || printf 'gpt-5.5\thigh\t1000000\t900000')"
+IFS=$'\t' read -r CODEX_MODEL CODEX_REASONING CODEX_CONTEXT_WINDOW CODEX_AUTO_COMPACT <<< "$CONFIG_VALS"
 
 # Session ID file — written next to raw output for runner to capture
 SESSION_FILE="$OUTPUT_DIR/codex-session.txt"
@@ -56,7 +67,7 @@ extract_review() {
 extract_session_id() {
   local jsonl_output="$1"
   local sid
-  sid="$(echo "$jsonl_output" | python3 -c "
+  sid="$(echo "$jsonl_output" | python -c "
 import json, sys
 for line in sys.stdin:
     try:
@@ -76,9 +87,11 @@ for line in sys.stdin:
 run_codex() {
   # Clear stale temp file before each attempt
   rm -f "$REVIEW_TMP"
+  # Ensure Codex finds AGENTS.md by running from the primecouncil directory
+  local PRIME_DIR
+  PRIME_DIR="$(cd "$(dirname "$CONFIG_FILE")" && pwd)"
+  pushd "$PRIME_DIR" > /dev/null
   # Prompt is piped via stdin (codex reads from stdin when the prompt arg is `-`).
-  # This avoids the Windows CreateProcess ~32KB CLI-arg limit that silently
-  # truncated large packets. After the file is consumed, codex sees EOF and proceeds.
   if [ -n "$RESUME_SESSION" ]; then
     codex exec resume "$RESUME_SESSION" -m "$CODEX_MODEL" \
       -c model_reasoning_effort="$CODEX_REASONING" \
@@ -92,11 +105,14 @@ run_codex() {
       -c model_auto_compact_token_limit="$CODEX_AUTO_COMPACT" \
       --json -o "$REVIEW_TMP" - <"$PROMPT_FILE" 2>&1
   fi
+  local EXIT_CODE=$?
+  popd > /dev/null
   # Verify -o produced non-empty output
   if [ ! -s "$REVIEW_TMP" ]; then
     echo "Codex succeeded but -o file is empty or missing" >&2
     return 1
   fi
+  return $EXIT_CODE
 }
 
 # Attempt 1

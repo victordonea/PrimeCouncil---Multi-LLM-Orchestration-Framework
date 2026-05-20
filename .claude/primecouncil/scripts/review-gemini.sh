@@ -22,10 +22,18 @@ mkdir -p "$OUTPUT_DIR"
 PROMPT="$(cat "$PROMPT_FILE")"
 TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-# Read config from config.json (resolved relative to this script)
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CONFIG_FILE="$SCRIPT_DIR/../config.json"
-GEMINI_MODEL="$(python3 -c "import json; print(json.load(open('$CONFIG_FILE')).get('gemini_model', 'gemini-3-flash-preview'))" 2>/dev/null || echo "gemini-3-flash-preview")"
+# Read config from config.json. Resolve the path inside Python so Windows + Git Bash
+# (/c/... vs C:\...) doesn't trip json.load.
+GEMINI_MODEL="$(python -c "
+import json, os, sys
+sd = os.path.dirname(os.path.abspath(sys.argv[1]))
+cf = os.path.join(sd, '..', 'config.json')
+try:
+    d = json.load(open(cf))
+    print(d.get('gemini_model', 'gemini-3-flash-preview'))
+except:
+    print('gemini-3-flash-preview')
+" "$0" 2>/dev/null || echo "gemini-3-flash-preview")"
 
 # Derive normalized review filename: gemini-output-raw.md -> gemini-review.md
 REVIEW_FILE="$(echo "$OUTPUT_FILE" | sed 's/-output-raw\.md/-review.md/')"
@@ -50,17 +58,29 @@ resume_failed() {
 # Run Gemini. If RESUME_SESSION is set, resume the latest session for this project.
 # Falls back to a fresh session if resume returns an error in stdout.
 run_gemini() {
+  # Ensure Gemini finds GEMINI.md and AGENTS.md by running from the primecouncil directory
+  local PRIME_DIR
+  PRIME_DIR="$(cd "$(dirname "$CONFIG_FILE")" && pwd)"
+  pushd "$PRIME_DIR" > /dev/null
+
   # </dev/null on every CLI invocation: prevents future hangs if Gemini ever
   # adopts stdin-appending behavior (Codex 0.129+ does this, hangs Python subprocess).
   if [ -n "$RESUME_SESSION" ]; then
     OUTPUT="$(gemini --resume latest -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1)" || true
     if [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then
       echo "$OUTPUT"
+      popd > /dev/null
       return 0
     fi
     echo "Resume latest failed or returned error. Starting fresh session..." >&2
   fi
-  gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1
+  
+  local FINAL_OUTPUT
+  FINAL_OUTPUT="$(gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1)"
+  local EXIT_CODE=$?
+  echo "$FINAL_OUTPUT"
+  popd > /dev/null
+  return $EXIT_CODE
 }
 
 # Attempt 1
@@ -73,7 +93,17 @@ fi
 echo "Gemini attempt 1 failed. Retrying with fresh session..."
 
 # Attempt 2 (always fresh on retry)
-if OUTPUT="$(gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1)" && [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then
+run_fresh_gemini() {
+  local PRIME_DIR
+  PRIME_DIR="$(cd "$(dirname "$CONFIG_FILE")" && pwd)"
+  pushd "$PRIME_DIR" > /dev/null
+  gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1
+  local EXIT_CODE=$?
+  popd > /dev/null
+  return $EXIT_CODE
+}
+
+if OUTPUT="$(run_fresh_gemini)" && [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then
   echo "$OUTPUT" > "$OUTPUT_FILE"
   extract_review "$OUTPUT"
   exit 0
