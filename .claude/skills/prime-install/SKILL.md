@@ -31,27 +31,14 @@ The generic PrimeCouncil tripwire block to insert/update (from the host-repo pat
 <!-- PRIMECOUNCIL:START - Do not edit this section manually -->
 ## PrimeCouncil
 
-Before orchestration decisions, read `.claude/primecouncil/orch-state.json`.
-If missing, default to `{"orch": "off", "default_mode": "manual"}`.
-`/prime-orch` is the canonical activation path; natural language commands are aliases.
+Multi-LLM orchestration, activated by `/prime-orch`. State lives in
+`.claude/primecouncil/orch-state.json`; missing means `{"orch": "off", "default_mode": "manual"}`.
 
-`ORCH ON/OFF`, `MODE MANUAL/STANDARD/DEEP` → update `orch-state.json`.
-`GO STANDARD/DEEP/DIRECT` → task-scoped only, do NOT update `orch-state.json`.
-
-If `orch` is `"on"`, or the user turns orchestration on, or issues a `GO` command:
-read `.claude/primecouncil/ORCHESTRATION.md` using the Read tool and enter orchestration-aware mode.
-`ORCH OFF` updates state and exits orchestration-aware mode — no contract loading needed.
-Do NOT use @import — read on demand.
-
-After `/compact` or session reset: re-read `orch-state.json`.
-If `orch` is `"on"`, re-read `.claude/primecouncil/ORCHESTRATION.md`.
-
-Do not load `AGENTS.md` on activation. Load only when entering reviewer/packetized steps.
-
-Confirm activation visibly when orchestration becomes active.
-
-If orchestration seems inactive when it should be active:
-read `.claude/primecouncil/ORCHESTRATION.md` and continue in orchestration-aware mode.
+**If `orch` is `"on"`, or the user issues an `ORCH ON` / `MODE` / `GO` command, read
+`.claude/primecouncil/ORCHESTRATION.md` with the Read tool — never `@import` — and follow it.**
+It owns the commands, the modes, and what else to load when; `ORCH OFF` only updates the state
+file. After `/compact` or a session reset, re-read the state file — and the contract too, if
+`orch` is on.
 <!-- PRIMECOUNCIL:END -->
 ```
 

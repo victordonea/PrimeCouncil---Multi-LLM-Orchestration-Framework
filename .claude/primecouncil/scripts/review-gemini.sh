@@ -57,29 +57,25 @@ resume_failed() {
 
 # Run Gemini. If RESUME_SESSION is set, resume the latest session for this project.
 # Falls back to a fresh session if resume returns an error in stdout.
+# Gemini runs from the caller's cwd (project root via runner.py) — do NOT cd into
+# the primecouncil directory: review packets reference repo files that Gemini
+# must be able to read.
 run_gemini() {
-  # Ensure Gemini finds GEMINI.md and AGENTS.md by running from the primecouncil directory
-  local PRIME_DIR
-  PRIME_DIR="$(cd "$(dirname "$CONFIG_FILE")" && pwd)"
-  pushd "$PRIME_DIR" > /dev/null
-
   # </dev/null on every CLI invocation: prevents future hangs if Gemini ever
   # adopts stdin-appending behavior (Codex 0.129+ does this, hangs Python subprocess).
   if [ -n "$RESUME_SESSION" ]; then
     OUTPUT="$(gemini --resume latest -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1)" || true
     if [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then
       echo "$OUTPUT"
-      popd > /dev/null
       return 0
     fi
     echo "Resume latest failed or returned error. Starting fresh session..." >&2
   fi
-  
+
   local FINAL_OUTPUT
   FINAL_OUTPUT="$(gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1)"
   local EXIT_CODE=$?
   echo "$FINAL_OUTPUT"
-  popd > /dev/null
   return $EXIT_CODE
 }
 
@@ -94,13 +90,8 @@ echo "Gemini attempt 1 failed. Retrying with fresh session..."
 
 # Attempt 2 (always fresh on retry)
 run_fresh_gemini() {
-  local PRIME_DIR
-  PRIME_DIR="$(cd "$(dirname "$CONFIG_FILE")" && pwd)"
-  pushd "$PRIME_DIR" > /dev/null
   gemini -m "$GEMINI_MODEL" -p "$PROMPT" </dev/null 2>&1
-  local EXIT_CODE=$?
-  popd > /dev/null
-  return $EXIT_CODE
+  return $?
 }
 
 if OUTPUT="$(run_fresh_gemini)" && [ -n "$OUTPUT" ] && ! resume_failed "$OUTPUT"; then

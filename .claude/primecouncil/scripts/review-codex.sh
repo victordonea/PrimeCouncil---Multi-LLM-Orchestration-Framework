@@ -83,14 +83,13 @@ for line in sys.stdin:
   fi
 }
 
-# Run Codex with --json (JSONL on stdout) and -o (plain text review to file)
+# Run Codex with --json (JSONL on stdout) and -o (plain text review to file).
+# Codex runs from the caller's cwd (project root via runner.py) — do NOT cd into
+# the primecouncil directory: review packets reference repo files that Codex
+# must be able to read.
 run_codex() {
   # Clear stale temp file before each attempt
   rm -f "$REVIEW_TMP"
-  # Ensure Codex finds AGENTS.md by running from the primecouncil directory
-  local PRIME_DIR
-  PRIME_DIR="$(cd "$(dirname "$CONFIG_FILE")" && pwd)"
-  pushd "$PRIME_DIR" > /dev/null
   # Prompt is piped via stdin (codex reads from stdin when the prompt arg is `-`).
   if [ -n "$RESUME_SESSION" ]; then
     codex exec resume "$RESUME_SESSION" -m "$CODEX_MODEL" \
@@ -106,7 +105,6 @@ run_codex() {
       --json -o "$REVIEW_TMP" - <"$PROMPT_FILE" 2>&1
   fi
   local EXIT_CODE=$?
-  popd > /dev/null
   # Verify -o produced non-empty output
   if [ ! -s "$REVIEW_TMP" ]; then
     echo "Codex succeeded but -o file is empty or missing" >&2
