@@ -25,28 +25,19 @@ Example: `2026-03-31-task-001-packet-system`
     round-01/
       claude-first-pass.md               # Claude's independent answer
       packet-codex.md                    # packet sent to Codex
-      packet-gemini.md                   # packet sent to Gemini
       codex-output-raw.md               # raw Codex CLI output
       codex-review.md                    # normalized review
-      gemini-output-raw.md              # raw Gemini CLI output
-      gemini-review.md                   # normalized review
       synthesis.md                       # Claude's synthesis
     round-02/
       packet-codex.md
-      packet-gemini.md
       codex-output-raw.md
       codex-review.md
-      gemini-output-raw.md
-      gemini-review.md
       synthesis.md
       final-recommendation.md           # final integrated recommendation
     implementation-review/               # optional
       packet-codex.md
-      packet-gemini.md
       codex-output-raw.md
       codex-review.md
-      gemini-output-raw.md
-      gemini-review.md
       claude-implementation-summary.md
       decision.md
 ```

@@ -4,8 +4,6 @@
     "command": "bash .claude/primecouncil/scripts/statusline.sh"
   },
   "permissions": {
-    "allow": [
-      "Bash(gemini -p \"Say only the word PING\")"
-    ]
+    "allow": []
   }
 }

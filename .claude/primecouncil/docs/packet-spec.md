@@ -38,7 +38,7 @@ Every packet must be self-contained enough to understand, but aggressively conci
 ## Packet types
 
 ### 1. First-pass review packet
-Used when Claude sends clean task context to Codex and Gemini for independent review.
+Used when Claude sends clean task context to Codex for independent review.
 
 **Sections:**
 - Task ID
@@ -87,26 +87,25 @@ Used after execution for optional post-implementation review.
 
 ---
 
-## Same packet body for both reviewers
-Codex and Gemini receive the same canonical packet structure.
-The only permitted difference is an optional short reviewer-focus line at the top:
-- For Codex: "Focus: depth of reasoning, hidden assumptions, structural weaknesses."
-- For Gemini: "Focus: UX/human considerations, alternative framing, unconventional ideas."
+## One canonical packet body
+Codex receives the canonical packet structure, opened by a short reviewer-focus line:
+"Focus: depth of reasoning, hidden assumptions, structural weaknesses."
 
-Do not create divergent packet systems per reviewer.
+Do not fork the packet system. A second reviewer, if one is ever added, takes this same body with
+its own focus line — never a packet shaped differently for it.
 
 ---
 
 ## File naming conventions
 
 Packets in run folders follow this naming:
-- `packet-codex.md` / `packet-gemini.md` — the sent packets
-- `codex-output-raw.md` / `gemini-output-raw.md` — raw CLI output (audit only)
-- `codex-review.md` / `gemini-review.md` — normalized review (Claude-consumable)
+- `packet-codex.md` — the sent packet
+- `codex-output-raw.md` — raw CLI output (audit only)
+- `codex-review.md` — normalized review (Claude-consumable)
 - `claude-first-pass.md` — Claude's independent first answer
 - `synthesis.md` — round synthesis
 - `final-recommendation.md` — final integrated recommendation
 - `claude-implementation-summary.md` — post-execution summary
 - `decision.md` — implementation review decision
 
-See `runs-readme.md` for full folder structure.
+See `runs-spec.md` for full folder structure.

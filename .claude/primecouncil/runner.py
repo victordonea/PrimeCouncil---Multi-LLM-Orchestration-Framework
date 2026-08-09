@@ -52,31 +52,23 @@ TEMPLATES_DIR = os.path.join(_PRIME_PARENT_DIR, CONFIG["templates_dir"])
 def _classify_round(present, is_impl=False):
     """Classify a round/impl folder's status from its file list.
 
-    Infers expected reviewers from packet files (compatible with single-reviewer mode).
+    The reviewer is Codex. A folder with no packet has not invoked review yet.
     Returns (status_string, missing_list) where missing only lists stage-blocking files.
+
+    ⚠ A round created before the single-reviewer move may still hold a second reviewer's packet
+    and outputs. Those files are simply not looked for — an archived round is judged on the
+    reviewer the project actually runs, so history stays readable without being re-litigated.
     """
     files = set(present)
     if not files:
         return "empty", []
 
-    # Infer which reviewers were intended from packet files
-    expect_codex = "packet-codex.md" in files
-    expect_gemini = "packet-gemini.md" in files
-    packets_exist = expect_codex or expect_gemini
-
-    if not packets_exist:
-        # Reviews not invoked yet — normal in-progress
+    if "packet-codex.md" not in files:
+        # Review not invoked yet — normal in-progress
         return "in_progress", []
 
-    # Build expected reviewer outputs based on which packets exist
-    expected_raw = set()
-    expected_review = set()
-    if expect_codex:
-        expected_raw.add("codex-output-raw.md")
-        expected_review.add("codex-review.md")
-    if expect_gemini:
-        expected_raw.add("gemini-output-raw.md")
-        expected_review.add("gemini-review.md")
+    expected_raw = {"codex-output-raw.md"}
+    expected_review = {"codex-review.md"}
 
     missing_raw = expected_raw - files
     missing_review = expected_review - files
@@ -218,13 +210,6 @@ def cmd_review(args):
     if args.impl and args.round is not None:
         print(json.dumps({"status": "error", "message": "Cannot use both --round and --impl"}))
         sys.exit(1)
-    if getattr(args, 'codex_only', False) and getattr(args, 'gemini_only', False):
-        print(json.dumps({"status": "error", "message": "Cannot use both --codex-only and --gemini-only"}))
-        sys.exit(1)
-
-    run_codex = not getattr(args, 'gemini_only', False)
-    run_gemini = not getattr(args, 'codex_only', False)
-
     task_dir = os.path.join(RUNS_DIR, args.task_id)
 
     # Validate task exists
@@ -261,16 +246,15 @@ def cmd_review(args):
     # Apply session guard: resume only if sessions are open
     if sessions is None:
         sessions = {"status": "open", "generation": 1,
-                     "codex_session_id": None, "gemini_session_id": None}
+                     "codex_session_id": None}
     elif sessions.get("status") == "closed":
         # Task was completed then reopened — fresh generation
         sessions = {"status": "open",
                      "generation": sessions.get("generation", 0) + 1,
-                     "codex_session_id": None, "gemini_session_id": None}
+                     "codex_session_id": None}
     # else: sessions are open — resume existing sessions
 
     codex_session_arg = sessions.get("codex_session_id") or ""
-    gemini_session_arg = sessions.get("gemini_session_id") or ""
 
     # Support implementation-review folder via --impl flag
     if args.impl:
@@ -285,26 +269,13 @@ def cmd_review(args):
     else:
         packet_body = sys.stdin.read()
 
-    # Fix #1: Write both packets with correct reviewer-specific focus lines
     codex_focus = "**Reviewer focus:** Depth of reasoning, hidden assumptions, structural weaknesses."
-    gemini_focus = "**Reviewer focus:** UX/human considerations, alternative framing, unconventional ideas."
 
     packet_codex_path = os.path.join(review_dir, "packet-codex.md")
-    packet_gemini_path = os.path.join(review_dir, "packet-gemini.md")
-
     codex_raw_path = os.path.join(review_dir, "codex-output-raw.md")
-    gemini_raw_path = os.path.join(review_dir, "gemini-output-raw.md")
     codex_review_path = os.path.join(review_dir, "codex-review.md")
-    gemini_review_path = os.path.join(review_dir, "gemini-review.md")
 
-    # Write packets only for reviewers being run
-    reviewers_to_write = []
-    if run_codex:
-        reviewers_to_write.append((packet_codex_path, codex_focus))
-    if run_gemini:
-        reviewers_to_write.append((packet_gemini_path, gemini_focus))
-
-    for pkt_path, focus in reviewers_to_write:
+    for pkt_path, focus in [(packet_codex_path, codex_focus)]:
         lines = packet_body.split("\n")
         has_existing_focus = any(l.strip().startswith("**Reviewer focus:**") for l in lines)
 
@@ -327,81 +298,31 @@ def cmd_review(args):
         with open(pkt_path, "w", encoding="utf-8") as f:
             f.write("\n".join(output_lines))
 
-    # Clear stale review files only for reviewers being run
-    # Also clean up skipped reviewer's old files to prevent misleading state
-    stale_files = []
-    if run_codex:
-        stale_files.extend([codex_raw_path, codex_review_path])
-    else:
-        # Skipped reviewer: preserve if any usable artifact exists (review OR raw output)
-        has_codex_artifact = (
-            (os.path.exists(codex_review_path) and os.path.getsize(codex_review_path) > 0) or
-            (os.path.exists(codex_raw_path) and os.path.getsize(codex_raw_path) > 0)
-        )
-        if not has_codex_artifact:
-            for old in [packet_codex_path, codex_raw_path, codex_review_path]:
-                if os.path.exists(old):
-                    os.remove(old)
-    if run_gemini:
-        stale_files.extend([gemini_raw_path, gemini_review_path])
-    else:
-        has_gemini_artifact = (
-            (os.path.exists(gemini_review_path) and os.path.getsize(gemini_review_path) > 0) or
-            (os.path.exists(gemini_raw_path) and os.path.getsize(gemini_raw_path) > 0)
-        )
-        if not has_gemini_artifact:
-            for old in [packet_gemini_path, gemini_raw_path, gemini_review_path]:
-                if os.path.exists(old):
-                    os.remove(old)
-    for stale in stale_files:
+    # Clear this round's stale review files so a re-run cannot be read against the previous one.
+    for stale in [codex_raw_path, codex_review_path]:
         if os.path.exists(stale):
             os.remove(stale)
 
     results = {"status": "ok", "review_dir": review_dir, "reviewers": {}}
 
     # Run Codex
-    if run_codex:
-        codex_script = os.path.join(SCRIPTS_DIR, "review-codex.sh")
-        try:
-            subprocess.run(
-                ["bash", codex_script, packet_codex_path, codex_raw_path, codex_session_arg],
-                timeout=CONFIG["review_timeout"],
-                check=False,
-            )
-            if os.path.exists(codex_review_path):
-                results["reviewers"]["codex"] = {"status": "ok", "review": codex_review_path}
-            elif os.path.exists(codex_raw_path):
-                results["reviewers"]["codex"] = {"status": "degraded", "raw": codex_raw_path}
-            else:
-                results["reviewers"]["codex"] = {"status": "failed"}
-        except subprocess.TimeoutExpired:
-            results["reviewers"]["codex"] = {"status": "timeout"}
-        except Exception as e:
-            results["reviewers"]["codex"] = {"status": "error", "message": str(e)}
-    else:
-        results["reviewers"]["codex"] = {"status": "skipped"}
-
-    # Run Gemini
-    if run_gemini:
-        gemini_script = os.path.join(SCRIPTS_DIR, "review-gemini.sh")
-        try:
-            subprocess.run(
-                ["bash", gemini_script, packet_gemini_path, gemini_raw_path, gemini_session_arg],
-                timeout=CONFIG["review_timeout"],
-                check=False,
-            )
-            if os.path.exists(gemini_review_path):
-                results["reviewers"]["gemini"] = {"status": "ok", "review": gemini_review_path}
-            elif os.path.exists(gemini_raw_path):
-                results["reviewers"]["gemini"] = {"status": "degraded", "raw": gemini_raw_path}
-            else:
-                results["reviewers"]["gemini"] = {"status": "failed"}
-        except subprocess.TimeoutExpired:
-            results["reviewers"]["gemini"] = {"status": "timeout"}
-        except Exception as e:
-            results["reviewers"]["gemini"] = {"status": "error", "message": str(e)}
-    else:
-        results["reviewers"]["gemini"] = {"status": "skipped"}
+    codex_script = os.path.join(SCRIPTS_DIR, "review-codex.sh")
+    try:
+        subprocess.run(
+            ["bash", codex_script, packet_codex_path, codex_raw_path, codex_session_arg],
+            timeout=CONFIG["review_timeout"],
+            check=False,
+        )
+        if os.path.exists(codex_review_path):
+            results["reviewers"]["codex"] = {"status": "ok", "review": codex_review_path}
+        elif os.path.exists(codex_raw_path):
+            results["reviewers"]["codex"] = {"status": "degraded", "raw": codex_raw_path}
+        else:
+            results["reviewers"]["codex"] = {"status": "failed"}
+    except subprocess.TimeoutExpired:
+        results["reviewers"]["codex"] = {"status": "timeout"}
+    except Exception as e:
+        results["reviewers"]["codex"] = {"status": "error", "message": str(e)}
 
     # ── Capture session IDs from scripts (partial failure guard: only update successful ones) ──
     codex_session_file = os.path.join(review_dir, "codex-session.txt")
@@ -410,13 +331,6 @@ def cmd_review(args):
             sid = f.read().strip()
             if sid:
                 sessions["codex_session_id"] = sid
-
-    # Gemini CLI's --list-sessions output is unreliable to parse, so we don't capture
-    # a UUID. Instead, mark the session as initiated; subsequent rounds pass "latest"
-    # to --resume. Only mark on success — failed runs leave the marker unchanged so a
-    # later retry doesn't try to resume a session that was never created.
-    if run_gemini and results["reviewers"].get("gemini", {}).get("status") in ("ok", "degraded"):
-        sessions["gemini_session_id"] = "latest"
 
     # Write updated sessions file
     with open(sessions_path, "w", encoding="utf-8") as f:
@@ -511,19 +425,11 @@ def cmd_status(args):
 
     if broken:
         result["has_incomplete"] = True
-        kind, num, present_files = broken[0]
-        # Infer reviewer flags from packet files
-        has_codex_pkt = "packet-codex.md" in present_files
-        has_gemini_pkt = "packet-gemini.md" in present_files
-        reviewer_flag = ""
-        if has_codex_pkt and not has_gemini_pkt:
-            reviewer_flag = " --codex-only"
-        elif has_gemini_pkt and not has_codex_pkt:
-            reviewer_flag = " --gemini-only"
+        kind, num, _present_files = broken[0]
         if kind == "round":
-            result["recovery_hint"] = f"Re-run: python .claude/primecouncil/runner.py review --task-id {args.task_id} --round {num}{reviewer_flag} --content \"...\""
+            result["recovery_hint"] = f"Re-run: python .claude/primecouncil/runner.py review --task-id {args.task_id} --round {num} --content \"...\""
         else:
-            result["recovery_hint"] = f"Re-run: python .claude/primecouncil/runner.py review --task-id {args.task_id} --impl{reviewer_flag} --content \"...\""
+            result["recovery_hint"] = f"Re-run: python .claude/primecouncil/runner.py review --task-id {args.task_id} --impl --content \"...\""
 
     print(json.dumps(result, indent=2))
 
@@ -663,8 +569,6 @@ def main():
     p_review.add_argument("--task-id", required=True, help="Task ID")
     p_review.add_argument("--round", type=int, default=None, help="Round number (omit if --impl)")
     p_review.add_argument("--impl", action="store_true", help="Run as implementation review (uses implementation-review/ folder)")
-    p_review.add_argument("--codex-only", action="store_true", help="Run only Codex reviewer")
-    p_review.add_argument("--gemini-only", action="store_true", help="Run only Gemini reviewer")
     p_review.add_argument("--content", default=None, help="Packet body (or pipe via stdin)")
 
     # new-round

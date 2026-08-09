@@ -10,7 +10,6 @@ If present, see `docs/project-context.md` for project-specific context.
 - **Human**: strategic supervisor, source of goals/preferences, final authority on hard directives.
 - **Claude**: orchestrator, synthesizer, sole executor. Drives tasks to completion.
 - **ChatGPT/Codex**: deep analytical reviewer. Strengths: depth of reasoning, hidden assumptions, edge cases, structural weaknesses.
-- **Gemini**: creative and human-centered reviewer. Strengths: unconventional ideas, product thinking, UX framing, alternate perspectives. On highly technical details, weigh maintainability and clarity over low-level implementation confidence.
 
 ---
 

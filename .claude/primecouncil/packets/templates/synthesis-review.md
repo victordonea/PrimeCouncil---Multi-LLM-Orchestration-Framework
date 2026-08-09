@@ -1,6 +1,6 @@
 # Synthesis Review Packet
 
-**Reviewer focus:** [For Codex: "depth of reasoning, hidden assumptions, structural weaknesses." / For Gemini: "UX/human considerations, alternative framing, unconventional ideas."]
+**Reviewer focus:** Depth of reasoning, hidden assumptions, structural weaknesses.
 
 ---
 

@@ -63,10 +63,8 @@ Ensure these exist, create any missing:
   config.json
   orch-state.json
   AGENTS.md
-  GEMINI.md
   scripts/
     review-codex.sh
-    review-gemini.sh
     statusline.sh
   packets/
     templates/
@@ -139,8 +137,8 @@ HOW A TASK WORKS:
 You describe what you need — a decision, a design, a feature, a fix.
 Claude recognizes it as a task and kicks off the orchestration:
 - Claude writes its own first-pass analysis
-- Codex (ChatGPT) and Gemini review independently — they can't see Claude's answer
-- Claude synthesizes all three perspectives into one picture
+- Codex (ChatGPT) reviews independently — it can't see Claude's answer
+- Claude synthesizes both perspectives into one picture
 - You get a checkpoint to add your input or continue
 - A second round of review happens with the combined view
 - Claude produces the final recommendation and executes

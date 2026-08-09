@@ -97,7 +97,6 @@ It should **not** be loaded merely because orchestration was turned on. This avo
 | PrimeCouncil tripwire | Root `CLAUDE.md` (managed block) | Every session (always, but small) |
 | Full orchestration contract | `.claude/primecouncil/ORCHESTRATION.md` | On demand (when orch is active) |
 | Reviewer rules | `.claude/primecouncil/AGENTS.md` | On demand (during reviewer/packetized steps only) |
-| Gemini-specific rules | `.claude/primecouncil/GEMINI.md` | On demand (during Gemini reviewer invocation) |
 | Orchestration state | `.claude/primecouncil/orch-state.json` | Checked before orchestration decisions |
 | Detailed project context | `docs/project-context.md` (optional) | On demand, if present |
 | Domain-specific rules (e.g. n8n) | `docs/` or `.claude/rules/` | On demand or path-scoped |
@@ -119,7 +118,7 @@ That means:
 1. Create the repo
 2. Write your project-first `CLAUDE.md` (just the project content — no PrimeCouncil block)
 3. Copy the `.claude/primecouncil/` folder into `.claude/primecouncil/`
-4. Copy `AGENTS.md` and `GEMINI.md` into `.claude/primecouncil/`
+4. Copy `AGENTS.md` into `.claude/primecouncil/`
 5. Run `/prime-install`
 6. The installer adds the managed tripwire block to your existing `CLAUDE.md`
 7. Say `ORCH ON` to activate when needed

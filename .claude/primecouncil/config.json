@@ -3,7 +3,6 @@
   "codex_reasoning_effort": "xhigh",
   "codex_context_window": 1000000,
   "codex_auto_compact_token_limit": 900000,
-  "gemini_model": "gemini-3-flash-preview",
   "runs_dir": "primecouncil/runs",
   "scripts_dir": "primecouncil/scripts",
   "templates_dir": "primecouncil/packets/templates",

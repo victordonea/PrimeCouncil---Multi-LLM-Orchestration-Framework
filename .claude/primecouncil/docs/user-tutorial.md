@@ -6,7 +6,7 @@
 
 ## What is PrimeCouncil?
 
-PrimeCouncil makes 3 AI models work together on your tasks instead of just one. **Claude** (your main assistant) leads the work. **Codex** (ChatGPT) and **Gemini** independently review Claude's ideas. They debate, disagree, and converge — and you get better results than any single AI could produce.
+PrimeCouncil makes two AI models work together on your tasks instead of just one. **Claude** (your main assistant) leads the work. **Codex** (ChatGPT) reviews Claude's ideas independently. They debate, disagree, and converge — and you get better results than either could produce alone.
 
 You stay in control. You choose when to activate it, what mode to use, and you make the final calls.
 
@@ -17,9 +17,7 @@ Before installing, make sure you have:
 1. **Claude Code** — working in VS Code (you're probably already here)
 2. **Codex CLI** — OpenAI's command-line tool for ChatGPT reviews
    <!-- Install: npm install -g @openai/codex. Auth: codex auth login -->
-3. **Gemini CLI** — Google's command-line tool for Gemini reviews
-   <!-- Install: npm install -g @google/gemini-cli. Auth: gemini (then /auth in interactive mode) -->
-4. **Python 3** — needed by the runner
+3. **Python 3** — needed by the runner
    <!-- Most systems have this. Test: python3 --version -->
 
 Don't worry if you're not sure — PrimeCouncil will tell you if something's missing when you first use it.
@@ -31,7 +29,6 @@ Don't worry if you're not sure — PrimeCouncil will tell you if something's mis
 Copy these into your project's root folder:
 - The `.claude/primecouncil/` folder (the whole thing)
 - `AGENTS.md`
-- `GEMINI.md`
 - The `.claude/skills/` folder (contains the PrimeCouncil skills)
 - `.claude/settings.json` (status line config)
 - `.gitignore` (so personal state files aren't committed)
@@ -79,8 +76,8 @@ Pick a mode, and the orchestration runs in two phases:
 
 **Phase 1 — Planning & Review**
 - Claude writes its own analysis first
-- Codex and Gemini review independently (they can't see Claude's answer)
-- Claude synthesizes all three perspectives
+- Codex reviews independently (it can't see Claude's answer)
+- Claude synthesizes both perspectives
 - You get a checkpoint to add input or continue
 - A second round of review happens
 - You get the final recommendation — the team's best answer
@@ -90,7 +87,7 @@ Pick a mode, and the orchestration runs in two phases:
 - Claude presents a post-execution summary: what was done, what worked, what got complicated, what changed vs plan
 - You get the final checkpoint:
   - **Accept & close task** — you're satisfied, task is marked complete
-  - **Send implementation to reviewers** — Codex & Gemini review what was actually built (catches mistakes, missed requirements, better alternatives)
+  - **Send implementation to reviewers** — Codex reviews what was actually built (catches mistakes, missed requirements, better alternatives)
   - **Rethink this** — something's off, go back and revisit the approach
 
 This gives you a **full closed loop** for every task: the team plans together, Claude builds, and you decide whether the result passes or needs another look.
@@ -177,9 +174,7 @@ Claude usually calls these automatically during orchestration. `status` and `lis
 |---|---|
 | `runner.py init` | Create new task folder + metadata |
 | `runner.py save` | Save any file to the right task/round location |
-| `runner.py review` | Write packets + run both reviewers + save outputs |
-| `runner.py review --codex-only` | Run only Codex (useful when Gemini has quota issues) |
-| `runner.py review --gemini-only` | Run only Gemini |
+| `runner.py review` | Write the packet + run the reviewer + save outputs |
 | `runner.py review --impl` | Run implementation review |
 | `runner.py new-round` | Create next round folder |
 | `runner.py status` | Show files in each round |
@@ -194,7 +189,6 @@ Claude usually calls these automatically during orchestration. `status` and `lis
 |---|---|---|
 | Orchestrator | Claude | Synthesis, execution, drives decisions |
 | Analytical reviewer | Codex CLI | Depth, hidden assumptions, edge cases, structural flaws |
-| Creative reviewer | Gemini CLI | UX, alternative framing, product thinking, fresh perspectives |
 | Supervisor | You | Goals, preferences, final authority |
 
 ---
@@ -204,16 +198,16 @@ Claude usually calls these automatically during orchestration. `status` and `lis
 1. You describe a task → Claude recognizes it and recommends STANDARD
 2. You say `GO STANDARD`
 3. Claude writes its own first-pass answer
-4. Claude sends clean packets to Codex and Gemini (without its own answer)
-5. Both reviewers respond independently
-6. Claude synthesizes all three views: agreements, disagreements, risks
+4. Claude sends a clean packet to Codex (without its own answer)
+5. The reviewer responds independently
+6. Claude synthesizes both views: agreements, disagreements, risks
 7. **Checkpoint:** Claude asks if you want to add a preference, constraint, or direction
 8. Claude sends the synthesis to both reviewers for a second pass
 9. Claude produces the final integrated recommendation
 10. Claude executes the chosen solution
 11. Claude presents a **post-execution summary** — what was done, what worked, what got complicated, what changed vs plan
-12. **Checkpoint:** Claude asks you to pick: **Accept & close task** (done!) / **Send implementation to reviewers** (Codex & Gemini check the work) / **Rethink this** (go back and revisit)
-13. If you pick "Accept & close task" → task is marked complete. If "Send implementation to reviewers" → Codex and Gemini review the implementation. If "Rethink this" → back to discussion.
+12. **Checkpoint:** Claude asks you to pick: **Accept & close task** (done!) / **Send implementation to reviewers** (Codex checks the work) / **Rethink this** (go back and revisit)
+13. If you pick "Accept & close task" → task is marked complete. If "Send implementation to reviewers" → Codex reviews the implementation. If "Rethink this" → back to discussion.
 
 ## How DEEP differs
 
@@ -259,7 +253,6 @@ When Claude asks for your input at checkpoints:
 | `CLAUDE.md` | Project identity + PrimeCouncil tripwire (managed block) | Always loaded as project context |
 | `.claude/primecouncil/ORCHESTRATION.md` | Full orchestration contract | On demand (when orch is active) |
 | `AGENTS.md` | Shared reviewer constitution | When orchestration step runs |
-| `GEMINI.md` | Gemini-specific instructions | When Gemini CLI is invoked |
 | `docs/project-context.md` | Deep project details (host repo, optional) | On demand if present |
 | `.claude/primecouncil/docs/project-progress.md` | Project story across sessions | By `/prime-resume` and `/prime-save` |
 | `.claude/primecouncil/docs/packet-spec.md` | Packet structure + brevity rules | When building packets |

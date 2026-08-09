@@ -6,20 +6,19 @@ A multi-LLM orchestration framework where Claude leads a structured team of AI r
 
 - **Claude** is the orchestrator, synthesizer, and executor
 - **Codex** is the deep analytical reviewer — finds hidden assumptions, edge cases, structural weaknesses
-- **Gemini** is the creative reviewer — brings fresh perspectives, UX thinking, alternative framing
 - **You** are the strategic supervisor — set goals, make final calls, steer direction
 
-Each reviewer works independently before seeing the others' answers. This prevents groupthink and produces genuinely diverse perspectives that Claude then synthesizes.
+The reviewer works independently, without seeing Claude's own answer. That is what keeps the two perspectives genuinely separate rather than one agreeing with the other.
 
 ## Three modes
 
 - **DIRECT** — Claude answers alone. For simple, informational, or speed-priority tasks.
-- **STANDARD** — Full team review. One independent round, one convergence round, user checkpoints. The strong default for real decisions.
-- **DEEP** — Multiple rounds until the team genuinely agrees. For high-stakes architectural choices.
+- **STANDARD** — Full review. One independent round, one convergence round, user checkpoints. The strong default for real decisions.
+- **DEEP** — Multiple rounds until both sides genuinely agree. For high-stakes architectural choices.
 
 ## Quick start
 
-1. Copy the `.claude/primecouncil/` folder (which now contains AGENTS.md + GEMINI.md inside it) and the `.claude/skills/` folder into your project repo
+1. Copy the `.claude/primecouncil/` folder (which now contains AGENTS.md inside it) and the `.claude/skills/` folder into your project repo
 2. Open Claude Code in the repo
 3. Run `/prime-install` — it sets up CLAUDE.md and fills in your project context
 4. Say `ORCH ON` and start working
@@ -32,7 +31,7 @@ Each reviewer works independently before seeing the others' answers. This preven
 | `ORCH OFF` | Back to normal Claude behavior |
 | `GO STANDARD` | Start a STANDARD review task |
 | `GO DEEP` | Start a DEEP convergence task |
-| `GO DIRECT` | Handle it directly, no reviewers |
+| `GO DIRECT` | Handle it directly, no reviewer |
 | `/prime-save` | Save task and project context before clearing |
 | `/prime-resume` | Restore context in a new session |
 | `/prime-install` | Set up PrimeCouncil in a new repo |
@@ -47,7 +46,6 @@ your-project/
     settings.json              # Status line + permissions
     primecouncil/
       AGENTS.md                # Shared reviewer constitution
-      GEMINI.md                # Gemini-specific reviewer instructions
       ORCHESTRATION.md         # Full orchestration contract (loaded on demand)
       runner.py                # Mechanical automation (folders, packets, reviewers)
       config.json              # Centralized paths, models, timeouts

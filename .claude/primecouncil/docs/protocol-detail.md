@@ -30,7 +30,7 @@ Header: "Mode" | Options:
 *After implementation + execution summary. Separate from the decision protocol stages.*
 Header: "Next step" | Options:
 - **Accept & close task** — Implementation approved, mark task complete
-- **Send implementation to reviewers** — Codex and Gemini review what was built
+- **Send implementation to reviewers** — Codex reviews what was built
 - **Rethink this** — Go back and revisit the approach
 *Follow-on: Accept & close task → call runner.py complete, recommend save. Send implementation to reviewers → Claude builds impl review packet. Rethink this → Claude recommends mode for the issue.*
 
@@ -45,21 +45,21 @@ Claude confirms: task name, objective, mode = STANDARD, orchestration active.
 Claude produces an independent answer: proposed solution, reasoning, assumptions, tradeoffs, uncertainties.
 
 ### Stage 2 — Clean delegation
-Claude sends only clean task context to Codex and Gemini via packet. This includes: user's request, relevant files/code/project context, constraints, success criteria, known risks.
+Claude sends only clean task context to Codex via packet. This includes: user's request, relevant files/code/project context, constraints, success criteria, known risks.
 Claude's own answer must NOT be included in this first review packet.
 
 ### Stage 3 — Independent reviews
-Codex and Gemini each produce an independent answer using the shared reviewer format.
+Codex produces an independent answer using the shared reviewer format.
 
 ### Stage 4 — Synthesis
-Claude synthesizes all three answers. Must preserve: agreements, disagreements, strong ideas, major risks, edge cases, alternatives, unresolved tradeoffs.
+Claude synthesizes both answers. Must preserve: agreements, disagreements, strong ideas, major risks, edge cases, alternatives, unresolved tradeoffs.
 
 **Synthesis preservation rules:**
 - Every unique idea from any reviewer must appear. Merge similar points, but never delete a unique one.
 - Disagreements must preserve each side's reasoning, not just the positions.
 - If an idea doesn't fit a category, create one. Don't force-fit or drop it.
 - Use lightweight source attribution in synthesis.md for readability:
-  [Codex] raised X — [Gemini] proposed Y — [Claude] initially preferred Z — [Shared] all three agreed on A
+  [Codex] raised X — [Claude] initially preferred Y — [Shared] both agreed on Z
 - When converting synthesis into the round-2 reviewer packet, remove attribution. Keep ideas and reasoning only. Exception: include attribution only when source matters materially (e.g., minority concern, unresolved disagreement where reasoning lineage matters).
 
 ### Stage 5 — Human checkpoint
@@ -71,11 +71,11 @@ Header: "Checkpoint" | Options:
 *Follow-on: Continue → Stage 6. Add preference/directive → Claude asks for details, proceeds to Stage 6. Pause or early close available via "Other" (Claude confirms if user wants to skip combined review).*
 
 ### Stage 6 — Combined second-pass review
-Claude presents synthesis + user input to Codex, Gemini, and himself. All three review the combined view.
+Claude presents synthesis + user input to Codex and to himself. Both review the combined view.
 
 ### Stage 7 — Final integration
 Claude produces the final STANDARD recommendation: recommended path, why it won, remaining minor tradeoffs, what user input changed, recommended next action.
-Note when all agents converge rapidly with no remaining disagreement — flag in the final recommendation if agreement may reflect groupthink rather than genuine convergence.
+Note when both agents converge rapidly with no remaining disagreement — flag in the final recommendation if agreement may reflect groupthink rather than genuine convergence.
 
 ---
 

@@ -108,9 +108,9 @@ In DEEP mode round 2+, do NOT re-read all previous synthesis files. Instead:
 
 ## Reviewer output handling
 - The runner + scripts handle raw output saving and review extraction automatically.
-- After `review` returns, read only the `codex-review.md` and `gemini-review.md` files it points to.
+- After `review` returns, read only the `codex-review.md` file it points to.
 - `*-output-raw.md` files are audit-only, except when a reviewer is degraded and the normalized review is missing. In that case, inspect the raw output to decide whether it is usable or should be re-run.
-- If the raw output contains a usable review, use it cautiously and note the degraded state in synthesis. If it is a failure artifact, incomplete, or incoherent, recommend re-running that reviewer via `review --round N --codex-only` or `--gemini-only`.
+- If the raw output contains a usable review, use it cautiously and note the degraded state in synthesis. If it is a failure artifact, incomplete, or incoherent, recommend re-running `review --round N`.
 
 ## Escalation
 Do not auto-switch modes. If STANDARD needs DEEP, recommend it, explain why, wait for user confirmation.

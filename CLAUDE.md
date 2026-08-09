@@ -2,18 +2,18 @@
 
 ## What this is
 Multi-LLM orchestration framework. Claude = orchestrator/synthesizer/executor.
-Codex + Gemini = independent reviewers. Human = strategic supervisor.
+Codex = the independent reviewer. Human = strategic supervisor.
 
 ## Status
 Framework complete. Post-first-run hardening done. Ready for production use.
 
 ## Stack
 - Python (runner), Bash (reviewer scripts)
-- Codex CLI, Gemini CLI (reviewer invocation)
+- Codex CLI (reviewer invocation)
 - Claude Code (orchestrator environment)
 
 ## Key directories
-- `.claude/primecouncil/` — runner, scripts, config, templates, docs, run history, AGENTS.md, GEMINI.md
+- `.claude/primecouncil/` — runner, scripts, config, templates, docs, run history, AGENTS.md
 - `.claude/skills/` — prime-orch, prime-save, prime-resume, prime-install
 - `.claude/primecouncil/docs/` — protocol detail, packet spec, runs spec, host-repo pattern, user tutorial
 
