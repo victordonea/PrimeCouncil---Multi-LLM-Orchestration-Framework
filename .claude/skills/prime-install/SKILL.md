@@ -146,7 +146,6 @@ Claude recognizes it as a task and kicks off the orchestration:
 
 KEY COMMANDS:
 - /prime-orch on/off/standard/deep/manual/status — control orchestration
-- /prime-save — save progress before /clear or restart
 - /prime-resume — pick up where you left off
 - ORCH ON, GO STANDARD, GO DEEP — natural language also works
 

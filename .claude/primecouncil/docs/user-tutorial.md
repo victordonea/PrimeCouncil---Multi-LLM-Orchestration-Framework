@@ -109,7 +109,6 @@ This gives you a **full closed loop** for every task: the team plans together, C
 | Set default mode | `/prime-orch standard` or `/prime-orch deep` or `/prime-orch manual` |
 | Override mode for one task | `GO STANDARD` or `GO DEEP` or `GO DIRECT` |
 | Check current state | `/prime-orch status` |
-| Save progress before clearing | `/prime-save` |
 | Resume after a break | `/prime-resume` |
 
 ## How modes work together
@@ -160,7 +159,6 @@ Natural language works too: "go deep on this", "direct answer please", "let's do
 | Skill | When to use | What it does |
 |---|---|---|
 | `/prime-install` | Setting up a new repo | Adds PrimeCouncil managed block to CLAUDE.md, creates orchestration contract |
-| `/prime-save` | After completing a task, or before `/clear` | Saves task-summary and/or updates project-progress |
 | `/prime-resume` | Starting a new session, after `/clear` | Loads saved context, shows where you left off, suggests next action |
 | `/prime-orch [on\|off\|standard\|deep\|manual\|status]` | Toggle orchestration state | Persists to `orch-state.json`, survives /compact and restarts |
 
@@ -202,7 +200,7 @@ Claude usually calls these automatically during orchestration. `status` and `lis
 5. The reviewer responds independently
 6. Claude synthesizes both views: agreements, disagreements, risks
 7. **Checkpoint:** Claude asks if you want to add a preference, constraint, or direction
-8. Claude sends the synthesis to both reviewers for a second pass
+8. Claude sends the synthesis to Codex for a second pass
 9. Claude produces the final integrated recommendation
 10. Claude executes the chosen solution
 11. Claude presents a **post-execution summary** — what was done, what worked, what got complicated, what changed vs plan
@@ -225,11 +223,10 @@ Each round overwrites a `current-state.md` so token cost stays flat.
 
 | Situation | What Claude recommends |
 |---|---|
-| Task completed | `/prime-save` to capture summary and progress |
-| About to `/clear` or restart | `/prime-save` first if there's unsaved context |
-| Topic switch | `/clear` (with `/prime-save` if needed) |
+| About to `/clear` or restart | What is in the run folder survives; what is only in the chat does not |
+| Topic switch | `/clear` |
 | Context at ~60% | `/compact` |
-| After 2–3 DEEP loops | Save + restart |
+| After 2–3 DEEP loops | Restart |
 | New session, want to continue | `/prime-resume` |
 
 ---
@@ -254,7 +251,7 @@ When Claude asks for your input at checkpoints:
 | `.claude/primecouncil/ORCHESTRATION.md` | Full orchestration contract | On demand (when orch is active) |
 | `AGENTS.md` | Shared reviewer constitution | When orchestration step runs |
 | `docs/project-context.md` | Deep project details (host repo, optional) | On demand if present |
-| `.claude/primecouncil/docs/project-progress.md` | Project story across sessions | By `/prime-resume` and `/prime-save` |
+| `.claude/primecouncil/docs/project-progress.md` | Project story across sessions — a FROZEN record; nothing writes it now | By `/prime-resume`, if present |
 | `.claude/primecouncil/docs/packet-spec.md` | Packet structure + brevity rules | When building packets |
 | `.claude/primecouncil/docs/protocol-detail.md` | Full STANDARD/DEEP stage walkthrough | When orchestration step runs |
 | `.claude/primecouncil/docs/runs-spec.md` | Run folder conventions | Reference only |

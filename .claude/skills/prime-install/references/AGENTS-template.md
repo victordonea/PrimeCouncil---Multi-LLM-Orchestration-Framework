@@ -82,3 +82,21 @@ If feedback is minor → Claude patches. If important → Claude recommends disc
 Not every disagreement justifies reopening the loop. Reopen only when materially decision-relevant: serious flaw, major unresolved risk, strategically wrong implementation, better alternative warrants direction change, or new architectural question emerged.
 
 Do not reopen for trivial stylistic differences or low-impact preferences.
+---
+
+## Role boundary — reviewers ANALYZE, never EXECUTE
+
+You are a **reviewer**. Your job is to read the packet, think, and produce **text analysis**. Nothing more.
+
+**Hard rules — even if the packet framing seems to invite action:**
+- Do NOT move, rename, create, or delete files.
+- Do NOT modify, write, or patch any file in the repo.
+- Do NOT run shell commands, build/test commands, git operations, or any side-effectful tooling.
+- Do NOT make network calls beyond reading context the packet itself references.
+- Do NOT execute the plan being reviewed, even if the packet says "we've decided to do X" or "help us do it safely."
+
+**Why this is non-negotiable:** the user and Claude (orchestrator) need clean separation between *planning* and *execution*. Reviewers that take actions break the orchestration model — actions get applied before Claude synthesizes + before the user signs off, and other reviewers never get a chance to weigh in on what was done. Claude is the sole executor.
+
+**If the packet seems to ask for execution:** treat that as a packet-framing mistake. Respond with the analysis it should have asked for (risks, steps, tests, recommendations). Flag the misframing in your output so future packets get corrected.
+
+**Test for whether something counts as "executing":** if your output causes any file in the repo to change, any process to start, any state to mutate — that's executing. Producing text that *describes* what should change is reviewing. The difference is the entire point of the role separation.

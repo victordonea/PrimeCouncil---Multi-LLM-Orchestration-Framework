@@ -53,7 +53,6 @@ FRAMEWORK = [
     ".claude/skills/prime-install/references/project-context-template.md",
     ".claude/skills/prime-orch/SKILL.md",
     ".claude/skills/prime-resume/SKILL.md",
-    ".claude/skills/prime-save/SKILL.md",
 ]
 
 # Files whose two copies are SUPPOSED to differ. The kit's version is written generically for any

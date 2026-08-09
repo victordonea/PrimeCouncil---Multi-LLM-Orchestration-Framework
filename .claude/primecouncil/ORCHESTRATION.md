@@ -66,7 +66,7 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 **Commands:**
 - `python .claude/primecouncil/runner.py init --label "task name" --mode standard --objective "brief"` → creates task folder + round-01 + task.md. Returns JSON with task_id and paths.
 - `python .claude/primecouncil/runner.py save --task-id TASK_ID --round N --filename NAME.md --content "..."` → saves any file to the right location.
-- `python .claude/primecouncil/runner.py review --task-id TASK_ID --round N --content "packet body"` → writes both reviewer packets, runs both scripts, returns JSON with paths to clean reviews. For implementation review use `--impl` instead of `--round N`.
+- `python .claude/primecouncil/runner.py review --task-id TASK_ID --round N --content "packet body"` → writes the reviewer packet, runs the review script, returns JSON with the path to the clean review. For implementation review use `--impl` instead of `--round N`.
 - `python .claude/primecouncil/runner.py new-round --task-id TASK_ID` → creates next round folder.
 - `python .claude/primecouncil/runner.py status --task-id TASK_ID` → shows files in each round.
 - `python .claude/primecouncil/runner.py complete --task-id TASK_ID` → marks task as complete, updates rounds count.
@@ -154,19 +154,15 @@ If implementation review surfaces material disagreement, recommend reopening orc
 ---
 
 ## Session hygiene
-All session actions require user approval. Claude recommends, never auto-executes. Session actions (/clear, /compact, restart) are user-triggered — Claude prepares save flow if needed, then prompts user to perform the action.
-
-**When to recommend saving** (present as numbered options in chat: Save task summary / Save project progress / Save both / Skip):
-- After meaningful task completion
-- Before recommending /clear, restart, or fresh session (if useful context would be lost)
+All session actions require user approval. Claude recommends, never auto-executes. Session actions (/clear, /compact, restart) are user-triggered — Claude prompts, the user performs. ⚠ Before recommending one, say plainly what context would be lost: the run folder keeps packets, reviews and syntheses, and nothing else survives a clear.
 
 **When to recommend a session action** (present as numbered options in chat: Save & [action] / [Action] now / Stay):
 - Topic switch detected → recommend /clear
 - Context reaching ~60% → recommend compacting
-- After 2–3 DEEP loops → recommend /prime-save then restart
+- After 2–3 DEEP loops → recommend a restart
 - After implementation review → recommend fresh session if pre-implementation history is no longer needed
 
-**Resuming:** Use `/prime-resume` to reconstruct context from saved artifacts.
+**Resuming:** `/prime-resume` reconstructs what it can from the run folder.
 **Plan before acting.** Do not execute until confidence is high. Ask clarifying questions first. Wasted implementation = wasted tokens.
 
 ## Output style
