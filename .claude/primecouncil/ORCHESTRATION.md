@@ -162,7 +162,7 @@ All session actions require user approval. Claude recommends, never auto-execute
 - After 2–3 DEEP loops → recommend a restart
 - After implementation review → recommend fresh session if pre-implementation history is no longer needed
 
-**Resuming:** `/prime-resume` reconstructs what it can from the run folder.
+**Resuming:** there is no resume command. After a reset, `runner.py status --task-id <id>` shows where the task stopped, and the run folder holds the packets, reviews and syntheses; current project state comes from the repo's own handoff docs, never from a saved snapshot.
 **Plan before acting.** Do not execute until confidence is high. Ask clarifying questions first. Wasted implementation = wasted tokens.
 
 ## Output style

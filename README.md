@@ -32,7 +32,6 @@ The reviewer works independently, without seeing Claude's own answer. That is wh
 | `GO STANDARD` | Start a STANDARD review task |
 | `GO DEEP` | Start a DEEP convergence task |
 | `GO DIRECT` | Handle it directly, no reviewer |
-| `/prime-resume` | Restore context in a new session |
 | `/prime-install` | Set up PrimeCouncil in a new repo |
 
 ## File structure
@@ -41,7 +40,7 @@ The reviewer works independently, without seeing Claude's own answer. That is wh
 your-project/
   CLAUDE.md                    # Project identity + PrimeCouncil managed tripwire block
   .claude/
-    skills/                    # PrimeCouncil skills (prime-orch, prime-resume, prime-install)
+    skills/                    # PrimeCouncil skills (prime-orch, prime-install)
     settings.json              # Status line + permissions
     primecouncil/
       AGENTS.md                # Shared reviewer constitution

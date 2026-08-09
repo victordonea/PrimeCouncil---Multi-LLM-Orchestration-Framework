@@ -14,7 +14,7 @@ Framework complete. Post-first-run hardening done. Ready for production use.
 
 ## Key directories
 - `.claude/primecouncil/` — runner, scripts, config, templates, docs, run history, AGENTS.md
-- `.claude/skills/` — prime-orch, prime-resume, prime-install
+- `.claude/skills/` — prime-orch, prime-install
 - `.claude/primecouncil/docs/` — protocol detail, packet spec, runs spec, host-repo pattern, user tutorial
 
 ## Key conventions
