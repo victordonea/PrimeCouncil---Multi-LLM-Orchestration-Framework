@@ -326,7 +326,7 @@ def cmd_review(args):
 
     # ── Capture session IDs from scripts (partial failure guard: only update successful ones) ──
     codex_session_file = os.path.join(review_dir, "codex-session.txt")
-    if run_codex and os.path.exists(codex_session_file):
+    if os.path.exists(codex_session_file):
         with open(codex_session_file, "r", encoding="utf-8") as f:
             sid = f.read().strip()
             if sid:
