@@ -105,7 +105,7 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 
 When the project defines domain "learnings" files (paid-for traps and conventions — e.g. an n8n, frontend or database learnings doc; the project's CLAUDE.md or ORCHESTRATION.md names them), and the task under review touches such a domain, the packet-authoring LLM MUST put that file in every reviewer's packet/prompt as a mandatory FULL read — top to bottom, ALL lines; partial or grep reads do not count.
 
-This binds EVERY reviewer the user requests — not only the first: "review with Codex + Opus" (or more) means EACH packet/prompt carries the same mandate, and the duty sits with the LLM sending them, per reviewer, per round. Harness-side sessions and subagents also invoke the matching project skill where one exists; external reviewers cannot load skills — the full learnings read is their substitute. Review advice produced without these files collides with the traps they record.
+This binds EVERY reviewer the user requests — not only the first: "review with Codex + Opus" (or more) means EACH packet/prompt carries the same mandate, and the duty sits with the LLM sending them, per reviewer, per round. Harness-side sessions and subagents also invoke the matching project skill where one exists AND read the learnings file. External reviewers cannot load skills — point them at the skill folder's own doc files BESIDE the learnings read: projects that periodically drain learnings into skill files keep knowledge there that the learnings file no longer carries, so the two complement each other and neither alone is enough. Review advice produced without these files collides with the traps they record.
 
 ---
 
