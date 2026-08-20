@@ -101,6 +101,14 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 
 ---
 
+## Domain reading mandates — EVERY reviewer, EVERY packet
+
+When the project defines domain "learnings" files (paid-for traps and conventions — e.g. an n8n, frontend or database learnings doc; the project's CLAUDE.md or ORCHESTRATION.md names them), and the task under review touches such a domain, the packet-authoring LLM MUST put that file in every reviewer's packet/prompt as a mandatory FULL read — top to bottom, ALL lines; partial or grep reads do not count.
+
+This binds EVERY reviewer the user requests — not only the first: "review with Codex + Opus" (or more) means EACH packet/prompt carries the same mandate, and the duty sits with the LLM sending them, per reviewer, per round. Harness-side sessions and subagents also invoke the matching project skill where one exists; external reviewers cannot load skills — the full learnings read is their substitute. Review advice produced without these files collides with the traps they record.
+
+---
+
 ## Orchestration duties (when STANDARD or DEEP)
 - **Independent first-pass.** Write the first-pass *without seeing reviewer output*. Independence means "not influenced by reviewers" — NOT a temporal "before reviewers fire" rule. The first-pass happens in parallel during the reviewer wait (see Parallel execution rule above), fired AFTER `runner.py review` is launched in background.
 - **First-pass scope — match it to the task's prior context.** When the task was already substantively explored in chat: keep the first-pass **tight (~10-30 lines)** — committed position in 2-3 sentences, top 3 risks (one line each), confidence + one-sentence rationale. That's enough to preserve commitment + independence + future-readability. When the task arrives **cold (no prior chat exploration)**: write a fuller first-pass (50-100 lines) capturing real analysis. Either way, substantive investigation — file inventories, deep risk analysis, test design — belongs in `claude-deeper-analysis.md` (saved during reviewer wait), NOT in the first-pass. The first-pass is a discipline checkpoint, not a research document.
