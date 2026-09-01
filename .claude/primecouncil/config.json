@@ -1,8 +1,8 @@
 {
-  "codex_model": "gpt-5.4",
+  "codex_model": "gpt-5.6-terra",
   "codex_reasoning_effort": "xhigh",
-  "codex_context_window": 1000000,
-  "codex_auto_compact_token_limit": 900000,
+  "codex_context_window": 872000,
+  "codex_auto_compact_token_limit": 785000,
   "runs_dir": "primecouncil/runs",
   "scripts_dir": "primecouncil/scripts",
   "templates_dir": "primecouncil/packets/templates",

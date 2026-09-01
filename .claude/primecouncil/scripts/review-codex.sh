@@ -31,14 +31,14 @@ cf = os.path.join(sd, '..', 'config.json')
 try:
     d = json.load(open(cf))
     print('\t'.join([
-        str(d.get('codex_model', 'gpt-5.5')),
+        str(d.get('codex_model', 'gpt-5.6-terra')),
         str(d.get('codex_reasoning_effort', 'high')),
-        str(d.get('codex_context_window', 1000000)),
-        str(d.get('codex_auto_compact_token_limit', 900000)),
+        str(d.get('codex_context_window', 872000)),
+        str(d.get('codex_auto_compact_token_limit', 785000)),
     ]))
 except:
-    print('gpt-5.5\thigh\t1000000\t900000')
-" "$0" 2>/dev/null || printf 'gpt-5.5\thigh\t1000000\t900000')"
+    print('gpt-5.6-terra\thigh\t872000\t785000')
+" "$0" 2>/dev/null || printf 'gpt-5.6-terra\thigh\t872000\t785000')"
 IFS=$'\t' read -r CODEX_MODEL CODEX_REASONING CODEX_CONTEXT_WINDOW CODEX_AUTO_COMPACT <<< "$CONFIG_VALS"
 
 # Session ID file — written next to raw output for runner to capture

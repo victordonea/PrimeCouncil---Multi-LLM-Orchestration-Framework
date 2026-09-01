@@ -18,7 +18,7 @@ _PRIME_PARENT_DIR = os.path.dirname(_RUNNER_DIR)
 _CONFIG_PATH = os.path.join(_RUNNER_DIR, "config.json")
 
 _DEFAULTS = {
-    "codex_model": "gpt-5.4",
+    "codex_model": "gpt-5.6-terra",
     "runs_dir": ".claude/primecouncil/runs",
     "scripts_dir": ".claude/primecouncil/scripts",
     "templates_dir": ".claude/primecouncil/packets/templates",
