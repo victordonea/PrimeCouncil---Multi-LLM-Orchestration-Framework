@@ -1,9 +1,9 @@
 # Task Summary
 
 This file is a handoff for resuming THIS specific task after /clear, compaction, or a new session.
-It is NOT a project-level file. For project story, see `.claude/primecouncil/docs/project-progress.md`.
+It is NOT a project-level file.
 
-**Anti-redundancy rule:** Only include details that help an LLM continue THIS task. Do not include project-level direction, completed milestones from other tasks, or broad context already in project-progress.md.
+**Anti-redundancy rule:** Only include details that help an LLM continue THIS task. Do not include project-level direction, completed milestones from other tasks, or context the repo's own docs already hold.
 
 **Test:** Could another LLM resume this exact task from this file + the linked artifacts alone?
 

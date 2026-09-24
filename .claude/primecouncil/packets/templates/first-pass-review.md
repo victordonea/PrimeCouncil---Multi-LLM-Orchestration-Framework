@@ -45,6 +45,7 @@ If you need more context, explore beyond the specified ranges before deciding.
 - In your review, note briefly if you explored beyond the suggested ranges and why.
 - If you stayed within the suggested ranges, note that they were sufficient.
 - If context still feels insufficient, say exactly what file or section is missing.
+- Any wording you propose for a document, a comment or a served string follows the writing rules in the repo's `CLAUDE.md` — read that section before proposing text.
 
 ## Required output format
 [Specify the shape that best fits this task. End with confidence.]

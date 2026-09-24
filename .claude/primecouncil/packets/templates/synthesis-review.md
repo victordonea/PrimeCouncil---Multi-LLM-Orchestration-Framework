@@ -45,6 +45,7 @@
 - If you stayed within the suggested ranges, note that they were sufficient.
 - If context still feels insufficient, say exactly what file or section is missing.
 - If no file references are included, confirm the packet itself was sufficient for your assessment.
+- Any wording you propose for a document, a comment or a served string follows the writing rules in the repo's `CLAUDE.md` — read that section before proposing text.
 
 ## Required output format
 [Specify the shape that best fits this task. End with confidence.]
