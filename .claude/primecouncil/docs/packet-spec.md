@@ -55,6 +55,12 @@ Used when Claude sends clean task context to Codex for independent review.
 
 **Rule:** Must NOT contain Claude's own first-pass answer.
 
+**Question zero — mandatory in every design/fix review packet, ahead of the task's own questions:**
+*"Is there a SIMPLER shape that solves the problem? If this design's complexity is justified, name
+the constraint that forces it — quoted, with its boundary."* A verdict that defends the design
+without answering question zero is incomplete. (Reviews converge on the design they are given;
+this question is the one standing counterweight.)
+
 ### 2. Synthesis review packet
 Used after Claude combines all views for a second-pass combined review.
 

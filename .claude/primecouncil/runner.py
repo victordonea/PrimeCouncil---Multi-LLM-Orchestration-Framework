@@ -9,6 +9,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -98,26 +99,32 @@ def get_today():
     return datetime.date.today().strftime("%Y-%m-%d")
 
 
+_TASK_NUM = re.compile(r"^\d{4}-\d{2}-\d{2}-task-(\d+)")
+_DATED = re.compile(r"^\d{4}-\d{2}-\d{2}-")
+
+
 def find_next_task_number():
-    """Find the next sequential task number across all runs."""
+    """Find the next sequential task number across all runs.
+
+    The number is the FIRST `-task-N` after the date, so a label that names a task itself
+    (`…-task-311-task-312-…`) cannot hide it. A folder in runs/ whose name is not dated is an
+    archive (e.g. `development-phase/`); the run folders inside it count too, so archiving the
+    newest runs cannot restart the numbering.
+    """
     if not os.path.exists(RUNS_DIR):
         return 1
-    existing = os.listdir(RUNS_DIR)
-    max_num = 0
-    for name in existing:
-        parts = name.split("-task-")
-        if len(parts) == 2:
-            try:
-                num = int(parts[1].split("-")[0])
-                max_num = max(max_num, num)
-            except ValueError:
-                pass
-    return max_num + 1
+    names = []
+    for name in os.listdir(RUNS_DIR):
+        names.append(name)
+        sub = os.path.join(RUNS_DIR, name)
+        if os.path.isdir(sub) and not _DATED.match(name):
+            names.extend(os.listdir(sub))
+    nums = [int(m.group(1)) for m in map(_TASK_NUM.match, names) if m]
+    return max(nums, default=0) + 1
 
 
 def make_task_id(label):
     """Generate task ID: YYYY-MM-DD-task-NNN-slug"""
-    import re
     num = find_next_task_number()
     slug = label.lower().replace(" ", "-").replace("_", "-")
     slug = re.sub(r'[^a-z0-9-]', '', slug)  # keep only safe chars
@@ -487,7 +494,11 @@ def cmd_complete(args):
 # ─── LIST ─────────────────────────────────────────────────
 
 def cmd_list(args):
-    """List all tasks with status, mode, last-modified, and summary availability."""
+    """List all tasks with status, mode, last-modified, and summary availability.
+
+    Archive folders (not dated) are skipped; an archived task is still addressed as
+    `--task-id <archive>/<task-id>`.
+    """
     if not os.path.exists(RUNS_DIR):
         print(json.dumps({"status": "ok", "tasks": []}))
         return
@@ -495,7 +506,7 @@ def cmd_list(args):
     tasks = []
     for name in sorted(os.listdir(RUNS_DIR)):
         task_dir = os.path.join(RUNS_DIR, name)
-        if not os.path.isdir(task_dir):
+        if not os.path.isdir(task_dir) or not _DATED.match(name):
             continue
 
         task_info = {"task_id": name}

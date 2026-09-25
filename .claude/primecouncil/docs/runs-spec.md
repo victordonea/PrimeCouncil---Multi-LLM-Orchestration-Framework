@@ -9,8 +9,13 @@ Hybrid: `YYYY-MM-DD-task-NNN-short-slug`
 Example: `2026-03-31-task-001-packet-system`
 
 - Date = task start date
-- NNN = sequential number
+- NNN = sequential number — the runner reads the first `-task-N` of every run folder's name
 - Slug = short human-readable label
+
+## Archives
+A folder in `runs/` whose name is not dated is an archive of older run folders (for example
+`development-phase/`). The runner counts task numbers inside it too, `list` skips it, and an
+archived task is addressed as `--task-id <archive>/<task-id>`.
 
 ---
 
