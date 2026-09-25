@@ -175,7 +175,7 @@ Claude usually calls these automatically during orchestration. `status` and `lis
 | `runner.py new-round` | Create next round folder |
 | `runner.py status` | Show files in each round |
 | `runner.py complete` | Mark task as complete |
-| `runner.py list` | List all tasks with status, mode, and summary info |
+| `runner.py list` | List the tasks outside archive folders, with status, mode, and summary info |
 
 ---
 
