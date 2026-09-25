@@ -117,11 +117,10 @@ That means:
 
 1. Create the repo
 2. Write your project-first `CLAUDE.md` (just the project content — no PrimeCouncil block)
-3. Copy the `.claude/primecouncil/` folder into `.claude/primecouncil/`
-4. Copy `AGENTS.md` into `.claude/primecouncil/`
-5. Run `/prime-install`
-6. The installer adds the managed tripwire block to your existing `CLAUDE.md`
-7. Say `ORCH ON` to activate when needed
+3. Copy the kit's `.claude/primecouncil/` folder (`AGENTS.md` is inside it) and its `.claude/skills/prime-install/` and `.claude/skills/prime-orch/` folders into the repo
+4. Run `/prime-install`
+5. The installer adds the managed tripwire block to your existing `CLAUDE.md`
+6. Say `ORCH ON` to activate when needed
 
 ## Rules
 

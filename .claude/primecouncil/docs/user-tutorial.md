@@ -16,7 +16,7 @@ Before installing, make sure you have:
 
 1. **Claude Code** — working in VS Code (you're probably already here)
 2. **Codex CLI** — OpenAI's command-line tool for ChatGPT reviews
-   <!-- Install: npm install -g @openai/codex. Auth: codex auth login -->
+   <!-- Install: npm install -g @openai/codex. Auth: codex login -->
 3. **Python 3** — needed by the runner
    <!-- Most systems have this. Test: python3 --version -->
 
@@ -27,11 +27,12 @@ Don't worry if you're not sure — PrimeCouncil will tell you if something's mis
 **Step 1: Copy the PrimeCouncil kit into your project**
 
 Copy these into your project's root folder:
-- The `.claude/primecouncil/` folder (the whole thing)
-- `AGENTS.md`
+- The `.claude/primecouncil/` folder (the whole thing, `AGENTS.md` included)
 - The `.claude/skills/` folder (contains the PrimeCouncil skills)
-- `.claude/settings.json` (status line config)
-- `.gitignore` (so personal state files aren't committed)
+
+Then merge, never overwrite, two of your own files:
+- `.claude/settings.json` — add the kit's `statusLine` entry
+- `.gitignore` — add the kit's lines, so personal state files aren't committed
 
 **Step 2: Run the installer**
 
@@ -247,7 +248,7 @@ When Claude asks for your input at checkpoints:
 |---|---|---|
 | `CLAUDE.md` | Project identity + PrimeCouncil tripwire (managed block) | Always loaded as project context |
 | `.claude/primecouncil/ORCHESTRATION.md` | Full orchestration contract | On demand (when orch is active) |
-| `AGENTS.md` | Shared reviewer constitution | When orchestration step runs |
+| `.claude/primecouncil/AGENTS.md` | Shared reviewer constitution | When orchestration step runs |
 | `docs/project-context.md` | Deep project details (host repo, optional) | On demand if present |
 | `.claude/primecouncil/docs/packet-spec.md` | Packet structure + brevity rules | When building packets |
 | `.claude/primecouncil/docs/protocol-detail.md` | Full STANDARD/DEEP stage walkthrough | When orchestration step runs |

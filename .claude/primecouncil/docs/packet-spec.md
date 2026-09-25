@@ -7,13 +7,13 @@ Template files live in `.claude/primecouncil/packets/templates/`.
 
 ## Core principle
 A packet is a **decision brief**, not a conversation export.
-Every packet must be self-contained enough to understand, but aggressively concise.
+It is self-contained: the reviewer needs nothing from the conversation, and gets nothing it does not need.
 
 ---
 
-## Compactness rules (enforce always)
+## Compactness rules
 
-| Section | Hard limit |
+| Section | Limit |
 |---|---|
 | Objective | 3 lines max |
 | Scope | 5 lines max |
@@ -26,9 +26,14 @@ Every packet must be self-contained enough to understand, but aggressively conci
 
 **Synthesis exception:** Compactness matters, but never at the cost of dropping a unique perspective or reasoning from any reviewer. Deduplicate and merge similar points, but preserve every distinct idea.
 
+A limit never drops a measurement, a locked decision or a file the reviewer must read.
+
+**Always include:** what the session measured (with numbers), what is locked, and what is open. A transcript is never pasted.
+
+**Reading is required work.** Every packet says so in plain words and allows read-only commands (`cat`, `rg`, `git show`, a script that only reads and prints): Codex reads a bare "do not run any command" as forbidding reads, and refuses the review.
+
 **Never include:**
-- Full chat history or transcript excerpts
-- Repeated protocol text (reviewers already have AGENTS.md)
+- Repeated protocol text: name `.claude/primecouncil/AGENTS.md` for the reviewer to read (nothing delivers it otherwise)
 - Long project background (reference docs/project-context.md if present)
 - Claude's own answer in first-pass review packets
 - Secrets, API keys, credentials, or personal/client-sensitive data

@@ -46,6 +46,7 @@ If you need more context, explore beyond the specified ranges before deciding.
 - If you stayed within the suggested ranges, note that they were sufficient.
 - If context still feels insufficient, say exactly what file or section is missing.
 - Any wording you propose for a document, a comment or a served string follows the writing rules in the repo's `CLAUDE.md` — read that section before proposing text.
+- Reading is required work: read-only commands (`cat`, `rg`, `git show`, a script that only reads and prints) are allowed. Your rules as a reviewer are in `.claude/primecouncil/AGENTS.md`.
 
 ## Required output format
 [Specify the shape that best fits this task. End with confidence.]

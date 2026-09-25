@@ -89,9 +89,30 @@ All file/folder operations during orchestration go through the runner. Do NOT ma
 
 ---
 
+## Parallel execution — always background `review`
+
+`runner.py review` takes minutes (the Codex sub-agent runs). **Fire `review` FIRST, with `run_in_background: true`, then immediately start the next parallel task.** Never block Claude's window on a `review` call — the rule is binary, no "this one will be quick" exceptions.
+
+**The two common patterns:**
+- **Both run independent passes:** fire `review` in background → Claude does his own independent pass during the wait → reconcile when reviewers return.
+- **Reviewers run, Claude has other work:** fire `review` in background → Claude continues that other work → handle reviewer output when notified.
+
+**Only block on `review`** when there is literally no parallel work available. **Don't poll** — the harness notifies on completion.
+
+---
+
+## Domain reading mandates — EVERY reviewer, EVERY packet
+
+When the project defines domain "learnings" files (paid-for traps and conventions — e.g. an n8n, frontend or database learnings doc; the project's CLAUDE.md or ORCHESTRATION.md names them), and the task under review touches such a domain, the packet-authoring LLM MUST put that file in every reviewer's packet/prompt as a mandatory FULL read — top to bottom, ALL lines; partial or grep reads do not count.
+
+This binds EVERY reviewer the user requests — not only the first: "review with Codex + Opus" (or more) means EACH packet/prompt carries the same mandate, and the duty sits with the LLM sending them, per reviewer, per round. Harness-side sessions and subagents also invoke the matching project skill where one exists AND read the learnings file. External reviewers cannot load skills — point them at the skill folder's own doc files BESIDE the learnings read: projects that periodically drain learnings into skill files keep knowledge there that the learnings file no longer carries, so the two complement each other and neither alone is enough. Review advice produced without these files collides with the traps they record.
+
+---
+
 ## Orchestration duties (when STANDARD or DEEP)
-- Produce independent first-pass answer before consulting reviewers.
-- Keep first reviewer pass clean — do not include own answer in review packets.
+- **Independent first-pass.** Write the first-pass *without seeing reviewer output*. Independence means "not influenced by reviewers" — NOT a temporal "before reviewers fire" rule. The first-pass happens in parallel during the reviewer wait (see Parallel execution rule above), fired AFTER `runner.py review` is launched in background.
+- **First-pass scope — match it to the task's prior context.** When the task was already substantively explored in chat: keep the first-pass **tight (~10-30 lines)** — committed position in 2-3 sentences, top 3 risks (one line each), confidence + one-sentence rationale. That's enough to preserve commitment + independence + future-readability. When the task arrives **cold (no prior chat exploration)**: write a fuller first-pass (50-100 lines) capturing real analysis. Either way, substantive investigation — file inventories, deep risk analysis, test design — belongs in `claude-deeper-analysis.md` (saved during reviewer wait), NOT in the first-pass. The first-pass is a discipline checkpoint, not a research document.
+- **Keep first reviewer packets clean.** Do not include your own answer in review packets (per AGENTS.md first-pass-independence rule). The packet contains task framing + context; the first-pass is a separate artifact reviewers never see.
 - Preserve detail during synthesis: agreements, disagreements, risks, strong ideas.
 - Present structured checkpoints as numbered options in chat at required stages (see protocol-detail.md for checkpoint specs).
 - Classify user input: soft preference / hard directive / no preference.
@@ -141,11 +162,7 @@ If implementation review surfaces material disagreement, recommend reopening orc
 ---
 
 ## Session hygiene
-All session actions require user approval. Claude recommends, never auto-executes. Session actions (/clear, /compact, restart) are user-triggered — Claude prepares save flow if needed, then prompts user to perform the action.
-
-**When to recommend saving** (present as numbered options in chat: Save task summary / Save project progress / Save both / Skip):
-- After meaningful task completion
-- Before recommending /clear, restart, or fresh session (if useful context would be lost)
+All session actions require user approval. Claude recommends, never auto-executes. Session actions (/clear, /compact, restart) are user-triggered — Claude prompts, the user performs. ⚠ Before recommending one, say plainly what context would be lost: the run folder keeps packets, reviews and syntheses, and nothing else survives a clear.
 
 **When to recommend a session action** (present as numbered options in chat: Save & [action] / [Action] now / Stay):
 - Topic switch detected → recommend /clear
@@ -153,7 +170,7 @@ All session actions require user approval. Claude recommends, never auto-execute
 - After 2–3 DEEP loops → recommend a restart
 - After implementation review → recommend fresh session if pre-implementation history is no longer needed
 
-**Resuming:** there is no resume command. After a reset, `runner.py status --task-id <id>` shows where the task stopped, and the run folder holds the packets, reviews and syntheses.
+**Resuming:** there is no resume command. After a reset, `runner.py status --task-id <id>` shows where the task stopped, and the run folder holds the packets, reviews and syntheses; current project state comes from the repo's own handoff docs, never from a saved snapshot.
 **Plan before acting.** Do not execute until confidence is high. Ask clarifying questions first. Wasted implementation = wasted tokens.
 
 ## Output style

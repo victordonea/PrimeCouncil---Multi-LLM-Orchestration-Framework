@@ -52,9 +52,9 @@ If `.claude/primecouncil/orch-state.json` does not exist, create it:
 }
 ```
 
-## Step 5 — Verify kit structure
+## Step 4 — Verify kit structure
 
-Ensure these exist, create any missing:
+Ensure these exist. A missing `ORCHESTRATION.md` or `AGENTS.md` is created from `references/orchestration-template.md` or `references/AGENTS-template.md`, a missing `runs/` as an empty folder; anything else missing means the kit copy is incomplete — tell the user.
 
 ```
 .claude/primecouncil/
@@ -84,44 +84,44 @@ Ensure these exist, create any missing:
 
 If the `.claude/primecouncil/` folder doesn't exist, tell the user to copy the PrimeCouncil kit into the repo first.
 
-## Step 6 — Project context (optional)
+## Step 5 — Project context (optional)
 
 Project context lives at `docs/project-context.md` in the host repo, NOT inside `.claude/primecouncil/docs/`.
 It is optional — the user decides whether to create it.
 
-**6a. If `docs/project-context.md` already exists**, present numbered options in chat:
+**5a. If `docs/project-context.md` already exists**, present numbered options in chat:
 Header: "Project context" | Options:
 - **Keep existing** — don't touch it
 - **Refresh** — update with a new scan while preserving structure
 - **Overwrite** — replace entirely with fresh generation
 
-If "Keep existing" → skip to Step 7.
+If "Keep existing" → skip to Step 6.
 
-**6b. If no file exists (or user chose Refresh/Overwrite)**, present numbered options in chat:
+**5b. If no file exists (or user chose Refresh/Overwrite)**, present numbered options in chat:
 Header: "Project context" | Options:
 - **Selective scan** — scan important files, follow references recursively
 - **Full scan** — scan the whole repo (excluding generated/irrelevant dirs)
 - **Skip** — no project context file
 
-If "Skip" → continue to Step 7.
+If "Skip" → continue to Step 6.
 
-**6c. Selective scan behavior:**
+**5c. Selective scan behavior:**
 - Start with anchor files: README.md, root docs, architecture/spec files, config/build files, existing CLAUDE.md, major directories referenced by docs
 - Recursively follow referenced files only when they materially improve understanding
 - Do not blindly read the entire repo
 
-**6d. Full scan behavior:**
+**5d. Full scan behavior:**
 - Scan the repo broadly, but **exclude**: `.git/`, `node_modules/`, `dist/`, `build/`, `__pycache__/`, `.next/`, `.claude/primecouncil/runs/`, lock files, binaries, media, generated/cache folders
 - Focus on source files, docs, and config
 
-**6e. Generate** `docs/project-context.md` using the template from `references/project-context-template.md`. The generated file should be comprehensive and high-value — not a lightweight placeholder.
+**5e. Generate** `docs/project-context.md` using the template from `references/project-context-template.md`. The generated file should be comprehensive and high-value — not a lightweight placeholder.
 
-**6f. If the installer created a new CLAUDE.md** (Step 1, "no CLAUDE.md exists" path):
+**5f. If the installer created a new CLAUDE.md** (Step 1, "no CLAUDE.md exists" path):
 - Ask the user to briefly describe: project purpose, stack, key conventions
 - Write project content above the PrimeCouncil markers (keep under 50 lines)
 - If CLAUDE.md already existed with project content, do NOT modify it
 
-## Step 7 — Confirm and show quickstart
+## Step 6 — Confirm and show quickstart
 
 Present a clear quickstart message to the user:
 
@@ -153,9 +153,8 @@ KEY COMMANDS:
 
 ## Rules
 - **Never overwrite the whole CLAUDE.md.** Only insert/update the managed block.
-- **Never recreate the old Part 1 / Part 2 structure.** That format is deprecated.
 - **Use markers** (`<!-- PRIMECOUNCIL:START -->` / `<!-- PRIMECOUNCIL:END -->`) for idempotent block management.
 - **Preserve all existing project content** outside the markers.
 - **Always ask before creating a new CLAUDE.md** if none exists.
-- **Keep it simple.** Ask the user for project details, don't auto-scan the repo.
+- **Keep it simple.** Scan the repo only when the user picks a scan in Step 5; the project content in CLAUDE.md comes from the user.
 - **Maintenance rule:** Whenever `.claude/primecouncil/ORCHESTRATION.md` changes, sync `references/orchestration-template.md`.
