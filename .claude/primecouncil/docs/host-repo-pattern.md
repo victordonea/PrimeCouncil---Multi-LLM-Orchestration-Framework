@@ -23,7 +23,7 @@ Project context belongs to the **host repo** (`docs/project-context.md`), not to
 ```
 [Your project content — identity, stack, conventions, rules]
 [References to detailed docs if needed]
-[30-50 lines, whatever the project requires]
+[whatever the project requires, under 200 lines]
 
 <!-- PRIMECOUNCIL:START - Do not edit this section manually -->
 [Managed tripwire block]
@@ -43,7 +43,7 @@ The block between the markers is **managed by PrimeCouncil**. The installer inse
 4. **References to detailed docs** — point to longer docs that Claude should read on demand, 2-3 lines
 5. **Directory boundaries** — if the repo has multiple technical domains, state which conventions apply where
 
-Keep it under 50 lines. If you need more detail, put it in separate docs and reference them.
+Keep it under 200 lines. If you need more detail, put it in separate docs and reference them.
 
 ## Root CLAUDE.md rules
 
